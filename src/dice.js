@@ -133,7 +133,6 @@
          * @returns {string} Random integer.
          */
         integer: function() {
-            // FIXME Should be between -2147483648 and 2147483647
             return (core.char("+- ") + core.int(10)).trim();
         },
 
