@@ -46,6 +46,23 @@
      */
     var core = {
         /**
+         * Generates a random integer in (min, max).
+         * If min > max, a random number in (max, min) is generated.
+         * If max is not given, a random number in (0, min) is generated.
+         *
+         * @param {number} min Lower boundary, or upper if max is not given.
+         * @param {number=} max Upper boundary.
+         * @returns {number} Random integer in (min, max) if min < max, otherwise a random integer in (max, min). If max
+         * is not specified, random integer in (0, min) if min > 0, otherwise in (min, 0).
+         */
+        int: function (min, max) {
+            if (arguments.length == 1)
+                return Math.floor(this.float(min));
+            else
+                return Math.floor(this.float(min, max));
+        },
+
+        /**
          * Generates a random float in (min, max).
          * If min > max, a random number in (max, min) is generated.
          * If max is not given, a random number in (0, min) is generated.
@@ -64,23 +81,6 @@
                 return r(0, min);
             else
                 return r(min, max);
-        },
-
-        /**
-         * Generates a random integer in (min, max).
-         * If min > max, a random number in (max, min) is generated.
-         * If max is not given, a random number in (0, min) is generated.
-         *
-         * @param {number} min Lower boundary, or upper if max is not given.
-         * @param {number=} max Upper boundary.
-         * @returns {number} Random integer in (min, max) if min < max, otherwise a random integer in (max, min). If max
-         * is not specified, random integer in (0, min) if min > 0, otherwise in (min, 0).
-         */
-        int: function (min, max) {
-            if (arguments.length == 1)
-                return Math.floor(this.float(min));
-            else
-                return Math.floor(this.float(min, max));
         },
 
         /**
