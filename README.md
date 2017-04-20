@@ -5,44 +5,46 @@ Library for generating various random entities.
 
 # API reference
 - [core](#core)
+- [css](#css)
 
 
 ## core
 The core functionality, contains very basic numeric generators, random selectors and shuffles.
 
-Methods:
+- [int](#core.int)
+- [float](#core.float)
+- [choice](#core.choice)
+- [char](#core.char)
+- [shuffle](#core.shuffle)
 
-- [int](#int)
-- [float](#float)
-- [choice](#choice)
-- [char](#char)
 
-
-### int
+### core.int
 ```
-dice.core.int(min[, max])
+dice.core.int(min[, max[, k]])
 ```
-Generates a uniformly distributed random integer. If `max` is not specified, an integer between 0 and `min` is returned.
+Generates some uniformly distributed random integers. If `max` is not specified, an integer between 0 and `min` is returned. If `k` is not specified, a single integer is returned.
 
 | argument | description |
 | --- | --- |
 | `min` | Lower boundary. |
 | `max` | Upper boundary. |
+| `k` | Number of integers to generate. |
 
 
-### float
+### core.float
 ```
-dice.core.float([min[, max]])
+dice.core.float([min[, max[, k]]])
 ```
-Generates a uniformly distributed random float. If no parameters are passed, a float between 0 and 1 is returned. If  only `min` is specified, a float between 0 and `min` is returned.
+Generates some uniformly distributed random floats. If no parameters are passed, a float between 0 and 1 is returned. If  only `min` is specified, a float between 0 and `min` is returned. If `k` is not specified, a single float is returned.
 
 | argument | description |
 | --- | --- |
 | `min` | Lower boundary. |
 | `max` | Upper boundary. |
+| `k` | Number of floats to generate. |
 
 
-### choice
+### core.choice
 ```
 dice.core.choice(values[, k])
 ```
@@ -51,10 +53,10 @@ Returns some random element of an array. If `k` is not specified, a single eleme
 | argument | description |
 | --- | --- |
 | `values` | Array of values. |
-| `max` | Number of elements to pick. |
+| `k` | Number of elements to pick. |
 
 
-### char
+### core.char
 ```
 dice.core.char(string[, k])
 ```
@@ -63,4 +65,26 @@ Returns some random characters of a string. If `k` is not specified, a single ch
 | argument | description |
 | --- | --- |
 | `string` | String of characters. |
-| `max` | Number of characters to pick. |
+| `k` | Number of characters to pick. |
+
+
+### core.shuffle
+```
+dice.core.shuffle(values)
+```
+Shuffles an array.
+
+| argument | description |
+| --- | --- |
+| `values` | Array to shuffle. |
+
+
+## css
+Methods to generate CSS related entities.
+TODO
+
+- [integer](#css.integer)
+- [number](#css.float)
+- [length](#css.length)
+- [color](#css.color)
+- [opacityValue](#css.opacityValue)

@@ -3,7 +3,7 @@ const svg = require("../src/dice").svg;
 
 var LAPS = 10000;
 
-describe("pick", function() {
+describe("dice", function() {
     describe("svg", function() {
         describe("integer()", function () {
             it("should return a random <integer>", function () {
@@ -48,7 +48,7 @@ describe("pick", function() {
                 for (var lap = 0; lap < LAPS; lap++) {
                     var re = new RegExp("^(#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})" +
                         "|(red|green|blue)" +
-                        "|rgb\\(\\d+%?,\\d+%?,\\d+%?(,\\d*.?\\d+)?\\))$");
+                        "|rgb\\((\\d+,\\d+,\\d+|\\d+%,\\d+%,\\d+%)(,\\d*.?\\d+)?\\))$");
                     assert.equal(true, re.test(svg.color()));
                 }
             });
@@ -57,7 +57,25 @@ describe("pick", function() {
         describe("opacityValue()", function () {
             it("should return a random <opacity-value>", function () {
                 for (var lap = 0; lap < LAPS; lap++) {
-                    assert.equal(true, /^[0-9]*\.?[0-9]+$/.test(svg.opacityValue()));
+                    assert.equal(true, /^(1|0)\.?[0-9]+$/.test(svg.opacityValue()));
+                }
+            });
+        });
+
+        describe("transformList()", function () {
+            it("should return a random <transform-list>", function () {
+                var re = new RegExp("^((matrix|translate|scale|rotate|skew(X|Y))" +
+                    "\\((-?\\d+\\.?\\d+,?)+\\) ?)+$");
+                for (var lap = 0; lap < LAPS; lap++) {
+                    assert.equal(true, re.test(svg.transformList()));
+                }
+            });
+        });
+
+        describe("point()", function () {
+            it("should return a random <point>", function () {
+                for (var lap = 0; lap < LAPS; lap++) {
+                    assert.equal(true, /^-?\d+\.?\d+,-?\d+\.?\d+$/.test(svg.point()));
                 }
             });
         });

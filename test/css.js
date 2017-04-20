@@ -3,7 +3,7 @@ var css = require("../src/dice").css;
 
 var LAPS = 10000;
 
-describe("pick", function() {
+describe("dice", function() {
     describe("css", function() {
         describe("integer()", function () {
             it("should return a random CSS <integer>", function () {

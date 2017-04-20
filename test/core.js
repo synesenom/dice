@@ -9,14 +9,41 @@ function add(dist, value) {
         dist[value]++;
 }
 
-describe('pick', function() {
+describe('dice', function() {
     describe('core', function() {
+        describe('float(min, max, k)', function() {
+            it('should return an array of floats uniformly distributed in (min, max)', function() {
+                for (var trial=0; trial<50; trial++) {
+                    var freqs = {};
+                    var min = Math.random() * 200 - 100;
+                    var max = Math.random() * 200 - 100;
+                    var k = Math.floor(Math.random()*40 - 20);
+                    for (var lap=0; lap<LAPS; lap++) {
+                        var r = core.float(min, max, k);
+                        if (k < 2)
+                            r = [r];
+                        r.forEach(function (ri) {
+                            add(freqs, Math.floor(ri));
+                            // Value is in range
+                            assert.equal(true, (min<max ? min : max) <= ri && ri <= (min<max ? max : min));
+                        });
+                        // Length is correct
+                        assert.equal(k < 2 ? 1 : k, r.length);
+                    }
+                    for (var i in freqs) {
+                        // Distribution is uniform
+                        assert.equal(true, freqs[i] > 0);
+                    }
+                }
+            });
+        });
+
         describe('float(min, max)', function() {
             it('should return a float uniformly distributed in (min, max)', function() {
                 for (var trial=0; trial<50; trial++) {
                     var freqs = {};
-                    var min = Math.random() * 50 - 100;
-                    var max = Math.random() * 50 - 100;
+                    var min = Math.random() * 200 - 100;
+                    var max = Math.random() * 200 - 100;
                     for (var lap=0; lap<LAPS; lap++) {
                         var r = core.float(min, max);
                         add(freqs, Math.floor(r));
@@ -35,7 +62,7 @@ describe('pick', function() {
             it('should return a float uniformly distributed in (0, max)', function() {
                 for (var trial=0; trial<50; trial++) {
                     var freqs = {};
-                    var max = Math.random() * 50 - 100;
+                    var max = Math.random() * 200 - 100;
                     for (var lap=0; lap<LAPS; lap++) {
                         var r = core.float(max);
                         add(freqs, Math.floor(r));
@@ -68,12 +95,39 @@ describe('pick', function() {
             });
         });
 
+        describe('int(min, max, k)', function() {
+            it('should return an array of integers uniformly distributed in (min, max)', function() {
+                for (var trial=0; trial<50; trial++) {
+                    var freqs = {};
+                    var min = Math.random() * 200 - 100;
+                    var max = Math.random() * 200 - 100;
+                    var k = Math.floor(Math.random()*40 - 20);
+                    for (var lap=0; lap<LAPS; lap++) {
+                        var r = core.float(min, max, k);
+                        if (k < 2)
+                            r = [r];
+                        r.forEach(function (ri) {
+                            add(freqs, ri);
+                            // Value is in range
+                            assert.equal(true, (min<max ? min : max) <= ri && ri <= (min<max ? max : min));
+                        });
+                        // Length is correct
+                        assert.equal(k < 2 ? 1 : k, r.length);
+                    }
+                    for (var i in freqs) {
+                        // Distribution is uniform
+                        assert.equal(true, freqs[i] > 0);
+                    }
+                }
+            });
+        });
+
         describe('int(min, max)', function() {
             it('should return an integer uniformly distributed in (min, max)', function() {
                 for (var trial=0; trial<50; trial++) {
                     var freqs = {};
-                    var min = Math.floor(Math.random() * 50 - 100);
-                    var max = Math.floor(Math.random() * 50 - 100);
+                    var min = Math.floor(Math.random() * 200 - 100);
+                    var max = Math.floor(Math.random() * 200 - 100);
                     for (var lap=0; lap<LAPS; lap++) {
                         var r = core.int(min, max);
                         add(freqs, r);
@@ -95,7 +149,7 @@ describe('pick', function() {
             it('should return an integer uniformly distributed in (0, max)', function() {
                 for (var trial=0; trial<50; trial++) {
                     var freqs = {};
-                    var max = Math.floor(Math.random() * 50 - 100);
+                    var max = Math.floor(Math.random() * 200 - 100);
                     for (var lap=0; lap<LAPS; lap++) {
                         var r = core.int(max);
                         add(freqs, r);
@@ -114,9 +168,9 @@ describe('pick', function() {
         describe('choice(values, k)', function() {
             it('should return some random elements of an array', function() {
                 for (var trial=0; trial<50; trial++) {
-                    var values = ['a', 'b', 'c', 2, 4, null, undefined];
+                    var values = ['a', 'b', 'c'];
                     var freqs = {};
-                    var k = Math.floor(Math.random()*100 - 200);
+                    var k = Math.floor(Math.random()*200 - 100);
                     for (var lap=0; lap<LAPS; lap++) {
                         var r = core.choice(values, k);
                         if (k < 2)
@@ -124,14 +178,17 @@ describe('pick', function() {
                         r.forEach(function (ri) {
                             add(freqs, ri);
                             // Value is in array
-                            assert.equal(true, values.indexOf(ri) > -1);
+                            assert.equal(values.indexOf(ri) > -1, true);
                         });
                         // Length is correct
                         assert.equal(k < 2 ? 1 : k, r.length);
                     }
-                    for (var i in freqs) {
+                    for (var i in values) {
                         // Distribution is uniform
-                        assert.equal(true, freqs[i] > 0);
+                        assert.equal(true, freqs[values[i]] > 0);
+                    }
+                    for (i in freqs) {
+                        assert.equal(values.indexOf(i) > -1, true)
                     }
                 }
             });
@@ -140,7 +197,7 @@ describe('pick', function() {
         describe('choice(values)', function() {
             it('should return a random element of an array', function() {
                 for (var trial=0; trial<50; trial++) {
-                    var values = ['a', 'b', 'c', 2, 4, null, undefined];
+                    var values = ['a', 'b', 'c', 2, 4, 1.234];
                     var freqs = {};
                     for (var lap=0; lap<LAPS; lap++) {
                         var r = core.choice(values);
@@ -148,9 +205,9 @@ describe('pick', function() {
                         // Character is in string
                         assert.equal(true, values.indexOf(r) > -1);
                     }
-                    for (var i in freqs) {
+                    for (var i in values) {
                         // Distribution is uniform
-                        assert.equal(true, freqs[i] > 0);
+                        assert.equal(true, freqs[values[i]] > 0);
                     }
                 }
             });
@@ -161,7 +218,7 @@ describe('pick', function() {
                 for (var trial=0; trial<50; trial++) {
                     var string = "abcdefghijkl51313#^!#?><;!-_=+.,/:{}()";
                     var freqs = {};
-                    var k = Math.floor(Math.random()*100 - 200);
+                    var k = Math.floor(Math.random()*200 - 100);
                     for (var lap=0; lap<LAPS; lap++) {
                         var r = core.char(string, k);
                         if (k < 2)
@@ -182,21 +239,26 @@ describe('pick', function() {
             });
         });
 
-        describe('char(string)', function() {
-            it('should return a random character of a string', function() {
+        describe('shuffle(values)', function() {
+            it('should shuffle an array', function() {
                 for (var trial=0; trial<50; trial++) {
-                    var string = "abcdefghijkl51313#^!#?><;!-_=+.,/:{}()";
-                    var freqs = {};
+                    var values = [];
+                    var pos = [];
+                    for (var i=0; i<100; i++) {
+                        values.push(i);
+                        pos.push({});
+                    }
+
                     for (var lap=0; lap<LAPS; lap++) {
-                        var r = core.char(string);
-                        add(freqs, r);
-                        // Character is in string
-                        assert.equal(true, string.indexOf(r) > -1);
+                        core.shuffle(values);
+                        values.forEach(function(v, i) {
+                            add(pos[v], i);
+                        });
                     }
-                    for (var i in freqs) {
-                        // Distribution is uniform
-                        assert.equal(true, freqs[i] > 0);
-                    }
+                    pos.forEach(function(p) {
+                        for (i in p)
+                            assert.equal(true, p[i] > 0);
+                    });
                 }
             });
         });
