@@ -244,7 +244,7 @@ describe('dice', function() {
                 for (var trial=0; trial<50; trial++) {
                     var values = [];
                     var pos = [];
-                    for (var i=0; i<100; i++) {
+                    for (var i=0; i<10; i++) {
                         values.push(i);
                         pos.push({});
                     }
