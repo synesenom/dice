@@ -11,11 +11,11 @@ Library for generating various random entities.
 ## core
 The core functionality, contains very basic numeric generators, random selectors and shuffles.
 
-- [int](#core.int)
-- [float](#core.float)
-- [choice](#core.choice)
-- [char](#core.char)
-- [shuffle](#core.shuffle)
+- [int](#core_int)
+- [float](#core_float)
+- [choice](#core_choice)
+- [char](#core_char)
+- [shuffle](#core_shuffle)
 
 
 ### core.int
@@ -31,7 +31,7 @@ Generates some uniformly distributed random integers. If `max` is not specified,
 | `k` | Number of integers to generate. |
 
 
-### core.float
+### float
 ```
 dice.core.float([min[, max[, k]]])
 ```
