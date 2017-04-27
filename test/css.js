@@ -46,7 +46,7 @@ describe("dice", function() {
         describe("opacityValue()", function () {
             it("should return a random CSS <opacity-value>", function () {
                 for (var lap = 0; lap < LAPS; lap++) {
-                    assert.equal(true, /^[0-9]*\.?[0-9]+$/.test(css.opacityValue()));
+                    assert.equal(true, /^(1|0)\.?[0-9]*$/.test(css.opacityValue()));
                 }
             });
         });

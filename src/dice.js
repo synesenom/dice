@@ -30,6 +30,24 @@
     }
 
     /**
+     * Generates a single value or an array of values.
+     *
+     * @param {function} generator Random generator to use.
+     * @param {number=} k Number of values to generate.
+     * @returns {number|string|Array} Single value or array of values.
+     */
+    function some(generator, k) {
+        if (k === null || k === undefined || k < 2)
+            return generator();
+        else {
+            var values = new Array(k);
+            for (var i=0; i<k; i++)
+                values[i] = generator();
+            return values;
+        }
+    }
+
+    /**
      * Core functionality, basic uniform generators.
      */
     var core = {
@@ -51,14 +69,9 @@
                 return r(0, 1);
             if (arguments.length == 1)
                 return r(0, min);
-            if (arguments.length == 3) {
-                var l = k < 2 ? 1 : k;
-                var floats = new Array(l);
-                for (var i=0; i<l; i++)
-                    floats[i] = r(min, max);
-                return floats;
-            } else
+            return some(function() {
                 return r(min, max);
+            }, k);
         },
 
         /**
@@ -69,21 +82,16 @@
          * @param {number} min Lower boundary.
          * @param {number=} max Upper boundary.
          * @param {number=} k Number of integers to return.
-         * @returns {number} Random integer in (min, max) if min < max, otherwise a random integer in (max, min). If max
+         * @returns {number|Array} Random integer in (min, max) if min < max, otherwise a random integer in (max, min). If max
          * is not specified, random integer in (0, min) if min > 0, otherwise in (min, 0). If k is specified, an Array
          * of integers between min and max is returned.
          */
         int: function (min, max, k) {
             if (arguments.length == 1)
-                return Math.floor(this.float(min+1));
-            if (arguments.length == 3) {
-                var l = k < 2 ? 1 : k;
-                var ints = new Array(l);
-                for (var i=0; i<l; i++)
-                    ints[i] = Math.floor(this.float(min, max+1));
-                return ints;
-            } else
-                return Math.floor(this.float(min, max+1));
+                return Math.floor(r(0, min+1));
+            return some(function () {
+                return Math.floor(r(min, max+1));
+            }, k);
         },
 
         /**
@@ -98,17 +106,9 @@
             // Return null if values is invalid
             if (values === null || values === undefined || values.length == 0)
                 return null;
-
-            if (arguments.length == 1 || k === null || k === undefined || k < 2)
-                return values[this.int(values.length-1)];
-            else {
-                var len = values.length;
-                var elems = [];
-                for (var i = 0; i < k; i++) {
-                    elems.push(values[this.int(len-1)]);
-                }
-                return elems;
-            }
+            return some(function () {
+                return values[Math.floor(r(0, values.length))];
+            }, k);
         },
 
         /**
@@ -119,16 +119,11 @@
          * @returns {object} Random character if k is not given or less than 2, an array of random characters otherwise.
          */
         char: function (string, k) {
-            var charsArray = string.split("");
-            if (arguments.length == 1 || k === null || k === undefined || k < 2)
-                return this.choice(charsArray);
-            else {
-                var chars = [];
-                for (var i = 0; i < k; i++) {
-                    chars.push(this.choice(charsArray));
-                }
-                return chars;
-            }
+            if (string === null || string === undefined || string.length == 0)
+                return "";
+            return some(function () {
+                return string.charAt(Math.floor(r(0, string.length)));
+            }, k);
         },
 
         /**
@@ -342,13 +337,202 @@
             return core.float(-10, 10, 2).join(",");
         },
 
-        // TODO unit test
+        /**
+         * Returns a random <path> string.
+         *
+         * @returns {string} Random path.
+         */
         path: function() {
+            var length = core.int(10);
+            var path = "M " + core.float(-10, 10, 2).join(" ");
+            for (var i=0; i<length; i++) {
+                var p = core.choice(["m", "l", "h", "v", "c", "s", "q", "t", "a", "z"]);
+                path += " " + core.choice([p, p.toUpperCase()]);
 
+                switch (p) {
+                    case "a":
+                        path += " " +core.float(-10, 10, 2).join(" ")
+                            + " " + core.float(-90, 90)
+                            + " " + core.int(0, 1, 2).join(" ")
+                            + " " + core.float(-10, 10, 2).join(" ");
+                        break;
+                    case "c":
+                        path += " " + core.float(-10, 10, 2).join(" ")
+                            + ", " + core.float(-10, 10, 2).join(" ")
+                            + ", " + core.float(-10, 10, 2).join(" ");
+                        break;
+                    case "s":
+                    case "q":
+                        path += " " + core.float(-10, 10, 2).join(" ")
+                            + ", " + core.float(-10, 10, 2).join(" ");
+                        break;
+                    case "m":
+                    case "l":
+                    case "t":
+                        path += " " + core.float(-10, 10, 2).join(" ");
+                        break;
+                    case "h":
+                    case "v":
+                        path += " " + core.float(-10, 10);
+                        break;
+                    case "z":
+                    default:
+                        break;
+                }
+            }
+            return path.trim();
         }
     };
+
+    var dist = {
+        /**
+         * Returns some uniformly distributed random values.
+         *
+         * @param {number} min Lower boundary.
+         * @param {number} max Upper boundary.
+         * @param {number=} k Number of values to return.
+         * @returns {number|Array} Single value or array of random values.
+         */
+        uniform: function (min, max, k) {
+            return some(function() {
+                return Math.random() * (max - min) + min;
+            }, k);
+        },
+
+        /**
+         * Returns some exponentially distributed random values.
+         *
+         * @param {number} lambda Rate parameter.
+         * @param {number=} k Number of values to return.
+         * @returns {number|Array} Single value or array of random values.
+         */
+        exponential: function (lambda, k) {
+            return some(function () {
+                return -Math.log(Math.random()) / lambda;
+            }, k);
+        },
+
+        /**
+         * Returns some Pareto distributed random values.
+         *
+         * @param {number} xmin Scale parameter.
+         * @param {number} alpha Shape parameter.
+         * @param {number=} k Number of values to return.
+         * @returns {number|Array} Single value or array of random values.
+         */
+        pareto: function (xmin, alpha, k) {
+            return some(function() {
+                return xmin / Math.pow(Math.random(), 1 / alpha);
+            }, k);
+        },
+
+        // TODO unit test
+        boundedPareto: function (xmin, xmax, alpha, k) {
+            var l = Math.pow(xmin, alpha);
+            var h = Math.pow(xmax, alpha);
+            return some(function () {
+                return Math.pow((h + Math.random() * (l - h)) / (l * h), -1 / alpha);
+            }, k);
+        }
+    };
+/*        custom: function() {
+            /!**
+             * Parameters of the generator: population, biased coins and aliases.
+             *!/
+            var n = 0;
+            var prob = [];
+            var alias = [];
+
+            return {
+                /!**
+                 * Initializes alias table with the given weights.
+                 * Weigts need not to be normalized.
+                 *
+                 * @param weights Weights to use in the alias table.
+                 *!/
+                init: function (weights) {
+                    // Single element
+                    if (weights.length == 0 || !(weights instanceof Array)) {
+                        prob = [0];
+                        alias = [0];
+                        return;
+                    }
+
+                    // Get sum (for normalization)
+                    n = weights.length;
+                    var sum = 0;
+                    for (var i = 0; i < n; i++)
+                        sum += weights[i];
+
+                    // Fill up small and large work lists
+                    var p = [];
+                    var small = [];
+                    var large = [];
+                    for (i = 0; i < n; i++) {
+                        p.push(this._n * weights[i] / sum);
+                        if (p[i] < 1.0)
+                            small.push(i);
+                        else
+                            large.push(i);
+                    }
+
+                    // Init tables
+                    prob = [];
+                    alias = [];
+                    for (i = 0; i < this._n; i++) {
+                        prob.push(1.0);
+                        alias.push(i);
+                    }
+
+                    // Fill up alias table
+                    var s = 0,
+                        l = 0;
+                    while (small.length > 0 && large.length > 0) {
+                        s = small.shift();
+                        l = large.shift();
+
+                        prob[s] = p[s];
+                        alias[s] = l;
+
+                        p[l] += p[s] - 1.0;
+                        if (p[l] < 1.0)
+                            small.push(l);
+                        else
+                            large.push(l);
+                    }
+                    while (large.length > 0) {
+                        l = large.shift();
+                        prob[l] = 1.0;
+                        alias[l] = l;
+                    }
+                    while (small.length > 0) {
+                        s = small.shift();
+                        prob[s] = 1.0;
+                        alias[s] = s;
+                    }
+                },
+
+                /!**
+                 * Returns an integer value according to the current alias table.
+                 *
+                 * @returns {number} Random integer.
+                 *!/
+                sample: function () {
+                    if (n <= 1) {
+                        return 0;
+                    }
+
+                    var i = Math.floor(Math.random() * n);
+                    if (Math.random() < prob[i])
+                        return i;
+                    else
+                        return alias[i];
+                }
+            };
+        };*/
 
     exports.core = core;
     exports.css = css;
     exports.svg = svg;
+    exports.dist = dist;
 })));

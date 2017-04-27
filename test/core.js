@@ -20,6 +20,7 @@ describe('dice', function() {
                     var k = Math.floor(Math.random()*40 - 20);
                     for (var lap=0; lap<LAPS; lap++) {
                         var r = core.float(min, max, k);
+                        //console.log(r);
                         if (k < 2)
                             r = [r];
                         r.forEach(function (ri) {

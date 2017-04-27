@@ -57,7 +57,7 @@ describe("dice", function() {
         describe("opacityValue()", function () {
             it("should return a random <opacity-value>", function () {
                 for (var lap = 0; lap < LAPS; lap++) {
-                    assert.equal(true, /^(1|0)\.?[0-9]+$/.test(svg.opacityValue()));
+                    assert.equal(true, /^(1|0)\.?[0-9]*$/.test(svg.opacityValue()));
                 }
             });
         });
@@ -76,6 +76,16 @@ describe("dice", function() {
             it("should return a random <point>", function () {
                 for (var lap = 0; lap < LAPS; lap++) {
                     assert.equal(true, /^-?\d+\.?\d+,-?\d+\.?\d+$/.test(svg.point()));
+                }
+            });
+        });
+
+        describe("path()", function () {
+            it("should return a random <path>", function () {
+                var re = new RegExp("^( ?(m|M|l|L|h|H|v|V|c|C|s|S|q|Q|t|T|a|A|z|Z)" +
+                    "( (-?\\d+\.?\\d+|1|0),?)*)+$");
+                for (var lap = 0; lap < LAPS; lap++) {
+                    assert.equal(true, re.test(svg.path()));
                 }
             });
         });
