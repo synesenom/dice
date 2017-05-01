@@ -1,10 +1,10 @@
 var assert = require('assert');
+var utils = require('../test/test-utils').test_uils;
 var math = require('mathjs');
 var jstat = require('jstat');
 var dist = require('../src/dice').dist;
 
-var TRIALS = 1;
-var LAPS = 1000000;
+var LAPS = 10000;
 var CHI_TABLE_LOW = [0, 6.635, 9.210, 11.345, 13.277, 15.086, 16.812, 18.475, 20.090, 21.666, 23.209, 24.725, 26.217,
     27.688, 29.141, 30.578, 32.000, 33.409, 34.805, 36.191, 37.566, 38.932, 40.289, 41.638, 42.980, 44.314, 45.642,
     46.963, 48.278, 49.588, 50.892, 52.191, 53.486, 54.776, 56.061, 57.342, 58.619, 59.893, 61.162, 62.428, 63.691,
@@ -43,149 +43,102 @@ var CHI_TABLE_HIGH = {
     1000: 1106.969
 };
 
-/**
- * Performs a Kolmogorov-Smirnov test with significance level of 99%.
- *
- * @param values Sample of continuous random values.
- * @param model Theoretical cumulative distribution function.
- */
-function ks_test(values, model) {
-    var D = 0;
-    values.sort(function (a, b) {
-        return a-b;
-    });
-    for (var i=0; i<values.length; i++) {
-        //console.log((i+1)/values.length, model(values[i]));
-        D = Math.max(D, Math.abs((i+1)/values.length - model(values[i])));
-    }
-    assert.equal(D <= 1.628/Math.sqrt(LAPS), true);
-}
-
-/**
- * Performs a chi-square test with significance level of 99%.
- *
- * @param values Sample of discrete random values.
- * @param model Theoretical cumulative mass function.
- * @param c Number of model parameters.
- */
-function chi_test(values, model, c) {
-    // Calculate distribution first
-    var p = {};
-    for (var i=0; i<values.length; i++) {
-        if (!p[values[i]])
-            p[values[i]] = 0;
-        p[values[i]]++;
-    }
-
-    // Calculate chi-square
-    var chi2 = 0;
-    for (var x in p) {
-        var m = model(x) * values.length;
-        chi2 += Math.pow(p[x] - m, 2) / m;
-    }
-
-    // Find critical value
-    var df = Object.keys(p).length - c - 1;
-    var crit = df <= 250 ? CHI_TABLE_LOW[df] : CHI_TABLE_HIGH[Math.floor(df/50) * 50];
-    assert.equal(chi2 <= crit, true);
-}
-
 describe('dice', function() {
     describe('dist', function() {
         /// Continuous distributions ///
         describe('uniform(min, max, n)', function () {
             it('should return an array of uniformly distributed values', function () {
-                for (var t=0; t<TRIALS; t++) {
+                utils.trials(function() {
                     const xmin = Math.random()*100 - 50;
                     const xmax = xmin + Math.random()*50;
-                    ks_test(dist.uniform(xmin, xmax, LAPS), function (x) {
+                    return utils.ks_test(dist.uniform(xmin, xmax, LAPS), function (x) {
                         return (x-xmin) / (xmax-xmin);
                     });
-                }
+                });
             });
         });
 
         describe('exponential(lambda, n)', function () {
             it('should return an array of exponentially distributed values', function () {
-                for (var t=0; t<TRIALS; t++) {
+                utils.trials(function() {
                     const lambda = Math.random()*10 + 1;
-                    ks_test(dist.exponential(lambda, LAPS), function (x) {
+                    return utils.ks_test(dist.exponential(lambda, LAPS), function (x) {
                         return 1 - Math.exp(-lambda * x);
                     });
-                }
+                });
             });
         });
 
         describe('pareto(xmin, alpha, n)', function () {
             it('should return an array of Pareto distributed values', function () {
-                for (var t=0; t<TRIALS; t++) {
+                utils.trials(function() {
                     const xmin = Math.random()*10 + 1;
                     const alpha = Math.random()*5 + 1;
-                    ks_test(dist.pareto(xmin, alpha, LAPS), function (x) {
+                    return utils.ks_test(dist.pareto(xmin, alpha, LAPS), function (x) {
                         return 1 - Math.pow(xmin / x, alpha);
                     });
-                }
+                });
             });
         });
 
         describe('boundedPareto(xmin, xmax, alpha, n)', function () {
             it('should return an array of bounded Pareto distributed values', function () {
-                for (var t=0; t<TRIALS; t++) {
+                utils.trials(function() {
                     const xmin = Math.random()*10 + 1;
                     const xmax = xmin + Math.random()*20 + 2;
                     const alpha = Math.random()*5 + 1;
-                    ks_test(dist.boundedPareto(xmin, xmax, alpha, LAPS), function (x) {
+                    return utils.ks_test(dist.boundedPareto(xmin, xmax, alpha, LAPS), function (x) {
                         return (1 - Math.pow(xmin / x, alpha)) / (1 - Math.pow(xmin / xmax, alpha));
                     });
-                }
+                });
             });
         });
 
         describe('normal(mu, sigma, n)', function () {
             it('should return an array of normally distributed values', function () {
-                for (var t=0; t<TRIALS; t++) {
+                utils.trials(function() {
                     const mu = Math.random()*10 + 1;
                     const sigma = Math.random()*10 + 1;
-                    ks_test(dist.normal(mu, sigma, LAPS), function (x) {
+                    return utils.ks_test(dist.normal(mu, sigma, LAPS), function (x) {
                         return 0.5 * (1 + math.erf((x-mu)/(sigma*Math.sqrt(2))));
                     });
-                }
+                });
             });
         });
 
         describe('lognormal(mu, sigma, n)', function () {
             it('should return an array of log-normally distributed values', function () {
-                for (var t=0; t<TRIALS; t++) {
+                utils.trials(function() {
                     const mu = Math.random()*10 + 1;
                     const sigma = Math.random()*10 + 1;
-                    ks_test(dist.lognormal(mu, sigma, LAPS), function (x) {
+                    return utils.ks_test(dist.lognormal(mu, sigma, LAPS), function (x) {
                         return 0.5 * (1 + math.erf((Math.log(x)-mu)/(sigma*Math.sqrt(2))));
                     });
-                }
+                });
             });
         });
 
         describe('weibull(mu, sigma, n)', function () {
             it('should return an array of Weibull distributed values', function () {
-                for (var t=0; t<TRIALS; t++) {
+                utils.trials(function() {
                     const lambda = Math.random()*10 + 0.1;
                     const k = Math.random()*10 + 0.1;
-                    ks_test(dist.weibull(lambda, k, LAPS), function (x) {
+                    return utils.ks_test(dist.weibull(lambda, k, LAPS), function (x) {
                         return 1 - Math.exp(-Math.pow(x/lambda, k));
                     });
-                }
+                });
             });
         });
 
         /// Descrete distributions ///
         describe('poisson(mu, sigma, n)', function () {
             it('should return an array of Poisson distributed values', function () {
-                for (var t=0; t<TRIALS; t++) {
+                utils.trials(function() {
                     const lambda = Math.random()*10 + 1;
-                    chi_test(dist.poisson(lambda, LAPS), function (x) {
+                    return utils.chi_test(dist.poisson(lambda, LAPS), function (x) {
                         return Math.pow(lambda, x) * Math.exp(-lambda) / math.factorial(x);
                     }, 1);
-                }
+                });
             });
         });
     });

@@ -1,7 +1,10 @@
 var assert = require('assert');
+var utils = require('../test/test-utils').test_uils;
 var core = require('../src/dice').core;
 
-var LAPS = 1000;
+var TRIALS = 1;
+var LAPS = 10000;
+
 function add(dist, value) {
     if (!dist.hasOwnProperty(value))
         dist[value] = 1;
@@ -11,167 +14,186 @@ function add(dist, value) {
 
 describe('dice', function() {
     describe('core', function() {
-        describe('float(min, max, k)', function() {
+        describe('float', function () {
             it('should return an array of floats uniformly distributed in (min, max)', function() {
-                for (var trial=0; trial<50; trial++) {
-                    var freqs = {};
+                utils.trials(function() {
                     var min = Math.random() * 200 - 100;
                     var max = Math.random() * 200 - 100;
-                    var k = Math.floor(Math.random()*40 - 20);
+                    var k = Math.floor(Math.random() * 40 - 20);
+                    var values = [];
                     for (var lap=0; lap<LAPS; lap++) {
                         var r = core.float(min, max, k);
-                        //console.log(r);
                         if (k < 2)
                             r = [r];
                         r.forEach(function (ri) {
-                            add(freqs, Math.floor(ri));
+                            values.push(ri);
                             // Value is in range
                             assert.equal(true, (min<max ? min : max) <= ri && ri <= (min<max ? max : min));
                         });
                         // Length is correct
                         assert.equal(k < 2 ? 1 : k, r.length);
                     }
-                    for (var i in freqs) {
-                        // Distribution is uniform
-                        assert.equal(true, freqs[i] > 0);
-                    }
-                }
-            });
-        });
 
-        describe('float(min, max)', function() {
-            it('should return a float uniformly distributed in (min, max)', function() {
-                for (var trial=0; trial<50; trial++) {
-                    var freqs = {};
+                    // Distribution is uniform
+                    if (min < max) {
+                        return utils.ks_test(values, function(x) {
+                            return (x-min) / (max-min);
+                        });
+                    } else {
+                        return utils.ks_test(values, function(x) {
+                            return (x-max) / (min-max);
+                        });
+                    }
+                });
+            });
+
+            it('should return a single float uniformly distributed in (min, max)', function() {
+                utils.trials(function() {
                     var min = Math.random() * 200 - 100;
                     var max = Math.random() * 200 - 100;
+                    var values = [];
                     for (var lap=0; lap<LAPS; lap++) {
                         var r = core.float(min, max);
-                        add(freqs, Math.floor(r));
+                        values.push(r);
                         // Value is in range
                         assert.equal(true, (min<max ? min : max) <= r && r <= (min<max ? max : min));
                     }
-                    for (var i in freqs) {
-                        // Distribution is uniform
-                        assert.equal(true, freqs[i] > 0);
-                    }
-                }
-            });
-        });
 
-        describe('float(max)', function() {
-            it('should return a float uniformly distributed in (0, max)', function() {
-                for (var trial=0; trial<50; trial++) {
-                    var freqs = {};
+                    // Distribution is uniform
+                    if (min < max) {
+                        return utils.ks_test(values, function(x) {
+                            return (x-min) / (max-min);
+                        });
+                    } else {
+                        return utils.ks_test(values, function(x) {
+                            return (x-max) / (min-max);
+                        });
+                    }
+                });
+            });
+
+            it('should return a single float uniformly distributed in (0, max)', function() {
+                utils.trials(function() {
                     var max = Math.random() * 200 - 100;
+                    var values = [];
                     for (var lap=0; lap<LAPS; lap++) {
                         var r = core.float(max);
-                        add(freqs, Math.floor(r));
+                        values.push(r);
                         // Value is in range
                         assert.equal(true, (0<max ? 0 : max) <= r && r <= (0<max ? max : 0));
                     }
-                    for (var i in freqs) {
-                        // Distribution is uniform
-                        assert.equal(true, freqs[i] > 0);
-                    }
-                }
-            });
-        });
 
-        describe('float()', function() {
-            it('should return a float uniformly distributed in (0, 1)', function() {
-                for (var trial=0; trial<50; trial++) {
-                    var freqs = {};
+                    // Distribution is uniform
+                    if (0 < max) {
+                        return utils.ks_test(values, function(x) {
+                            return x / max;
+                        });
+                    } else {
+                        return utils.ks_test(values, function(x) {
+                            return (max-x) / max;
+                        });
+                    }
+                });
+            });
+
+            it('should return a single float uniformly distributed in (0, 1)', function() {
+                utils.trials(function() {
+                    var values = [];
                     for (var lap=0; lap<LAPS; lap++) {
                         var r = core.float();
-                        add(freqs, Math.floor(r*100));
+                        values.push(r);
                         // Value is in range
                         assert.equal(true, 0 <= r && r <= 1);
                     }
-                    for (var i in freqs) {
-                        // Distribution is uniform
-                        assert.equal(true, freqs[i] > 0);
-                    }
-                }
+
+                    // Distribution is uniform
+                    return utils.ks_test(values, function(x) {
+                        return x;
+                    });
+                });
             });
         });
 
-        describe('int(min, max, k)', function() {
+        describe('int', function() {
             it('should return an array of integers uniformly distributed in (min, max)', function() {
-                for (var trial=0; trial<50; trial++) {
-                    var freqs = {};
-                    var min = Math.random() * 200 - 100;
-                    var max = Math.random() * 200 - 100;
-                    var k = Math.floor(Math.random()*40 - 20);
+                utils.trials(function() {
+                    var min = Math.floor(Math.random() * 200 - 100);
+                    var max = Math.floor(Math.random() * 200 - 100);
+                    var k = Math.floor(Math.random() * 40 - 20);
+                    var values = [];
                     for (var lap=0; lap<LAPS; lap++) {
-                        var r = core.float(min, max, k);
+                        var r = core.int(min, max, k);
                         if (k < 2)
                             r = [r];
-                        r.forEach(function (ri) {
-                            add(freqs, ri);
+                        for (var i=0; i<r.length; i++) {
+                            values.push(r[i]);
+
                             // Value is in range
-                            assert.equal(true, (min<max ? min : max) <= ri && ri <= (min<max ? max : min));
-                        });
+                            assert.equal(true, (min<max ? min : max) <= r[i] && r[i] <= (min<max ? max : min));
+                        }
                         // Length is correct
                         assert.equal(k < 2 ? 1 : k, r.length);
                     }
-                    for (var i in freqs) {
-                        // Distribution is uniform
-                        assert.equal(true, freqs[i] > 0);
-                    }
-                }
-            });
-        });
 
-        describe('int(min, max)', function() {
+                    // Distribution is uniform
+                    return utils.chi_test(values, function(x) {
+                        return 1 / Math.abs(max-min+1);
+                    }, 1);
+                });
+            });
+
             it('should return an integer uniformly distributed in (min, max)', function() {
-                for (var trial=0; trial<50; trial++) {
-                    var freqs = {};
+                utils.trials(function() {
                     var min = Math.floor(Math.random() * 200 - 100);
                     var max = Math.floor(Math.random() * 200 - 100);
+                    var values = [];
                     for (var lap=0; lap<LAPS; lap++) {
                         var r = core.int(min, max);
-                        add(freqs, r);
+                        values.push(r);
+
                         // Value is in range
                         assert.equal(true, (min<max ? min : max) <= r && r <= (min<max ? max : min));
 
                         // Value is integer
                         assert.equal(r, parseInt(r, 10));
                     }
-                    for (var i in freqs) {
-                        // Distribution is uniform
-                        assert.equal(true, freqs[i] > 0);
-                    }
-                }
-            });
-        });
 
-        describe('int(max)', function() {
-            it('should return an integer uniformly distributed in (0, max)', function() {
-                for (var trial=0; trial<50; trial++) {
-                    var freqs = {};
+                    // Distribution is uniform
+                    return utils.chi_test(values, function(x) {
+                        return 1 / Math.abs(max-min+1);
+                    }, 1);
+                });
+            });
+
+            it('should return a single integer uniformly distributed in (0, max)', function() {
+                utils.trials(function() {
                     var max = Math.floor(Math.random() * 200 - 100);
+                    var values = [];
                     for (var lap=0; lap<LAPS; lap++) {
                         var r = core.int(max);
-                        add(freqs, r);
+                        values.push(r);
+
                         // Value is in range
                         assert.equal(true, (0<max ? 0 : max) <= r && r <= (0<max ? max : 0));
+
+                        // Value is integer
                         assert.equal(r, parseInt(r, 10));
                     }
-                    for (var i in freqs) {
-                        // Distribution is uniform
-                        assert.equal(true, freqs[i] > 0);
-                    }
-                }
+
+                    // Distribution is uniform
+                    return utils.chi_test(values, function(x) {
+                        return 1 / Math.abs(max+1);
+                    }, 1);
+                });
             });
         });
 
         describe('choice(values, k)', function() {
             it('should return some random elements of an array', function() {
-                for (var trial=0; trial<50; trial++) {
+                for (var trial=0; trial<TRIALS; trial++) {
                     var values = ['a', 'b', 'c'];
                     var freqs = {};
-                    var k = Math.floor(Math.random()*200 - 100);
+                    var k = Math.floor(Math.random() * 200 - 100);
                     for (var lap=0; lap<LAPS; lap++) {
                         var r = core.choice(values, k);
                         if (k < 2)
@@ -197,25 +219,19 @@ describe('dice', function() {
 
         describe('char(string, k)', function() {
             it('should return some random characters of a string', function() {
-                for (var trial=0; trial<50; trial++) {
+                for (var trial=0; trial<TRIALS; trial++) {
                     var string = "abcdefghijkl51313#^!#?><;!-_=+.,/:{}()";
-                    var freqs = {};
-                    var k = Math.floor(Math.random()*200 - 100);
+                    var k = Math.floor(Math.random() * 200 - 100);
                     for (var lap=0; lap<LAPS; lap++) {
                         var r = core.char(string, k);
                         if (k < 2)
                             r = [r];
                         r.forEach(function (ri) {
-                            add(freqs, ri);
                             // Character is in array
                             assert.equal(true, string.indexOf(ri) > -1);
                         });
                         // Length is correct
                         assert.equal(k < 2 ? 1 : k, r.length);
-                    }
-                    for (var i in freqs) {
-                        // Distribution is uniform
-                        assert.equal(true, freqs[i] > 0);
                     }
                 }
             });
@@ -223,7 +239,7 @@ describe('dice', function() {
 
         describe('shuffle(values)', function() {
             it('should shuffle an array', function() {
-                for (var trial=0; trial<50; trial++) {
+                for (var trial=0; trial<TRIALS; trial++) {
                     var values = [];
                     var pos = [];
                     for (var i=0; i<10; i++) {
@@ -237,6 +253,8 @@ describe('dice', function() {
                             add(pos[v], i);
                         });
                     }
+
+                    // Check if all positions have been visited at least once
                     pos.forEach(function(p) {
                         for (i in p)
                             assert.equal(true, p[i] > 0);
