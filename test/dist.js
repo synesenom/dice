@@ -1,8 +1,8 @@
 var assert = require('assert');
 var dist = require('../src/dice').dist;
 
-var TRIALS = 3;
-var LAPS = 200000;
+var TRIALS = 1;
+var LAPS = 1000000;
 function ks_test(values, model) {
     var D = 0;
     values.sort(function (a, b) {
@@ -19,8 +19,8 @@ describe('dice', function() {
         describe('uniform(min, max, k)', function () {
             it('should return an array of uniformly distributed values', function () {
                 for (var t=0; t<TRIALS; t++) {
-                    var xmin = Math.random()*200 - 100;
-                    var xmax = xmin + Math.random()*100;
+                    var xmin = Math.random()*100 - 50;
+                    var xmax = xmin + Math.random()*50;
                     ks_test(dist.uniform(xmin, xmax, LAPS), function (x) {
                         return (x-xmin) / (xmax-xmin);
                     });
