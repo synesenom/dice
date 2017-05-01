@@ -195,25 +195,6 @@ describe('dice', function() {
             });
         });
 
-        describe('choice(values)', function() {
-            it('should return a random element of an array', function() {
-                for (var trial=0; trial<50; trial++) {
-                    var values = ['a', 'b', 'c', 2, 4, 1.234];
-                    var freqs = {};
-                    for (var lap=0; lap<LAPS; lap++) {
-                        var r = core.choice(values);
-                        add(freqs, r);
-                        // Character is in string
-                        assert.equal(true, values.indexOf(r) > -1);
-                    }
-                    for (var i in values) {
-                        // Distribution is uniform
-                        assert.equal(true, freqs[values[i]] > 0);
-                    }
-                }
-            });
-        });
-
         describe('char(string, k)', function() {
             it('should return some random characters of a string', function() {
                 for (var trial=0; trial<50; trial++) {

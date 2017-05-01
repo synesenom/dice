@@ -149,6 +149,7 @@
     var dist = {
         /**
          * Returns some uniformly distributed random values.
+         * https://en.wikipedia.org/wiki/Uniform_distribution_(continuous)
          *
          * @param {number} min Lower boundary.
          * @param {number} max Upper boundary.
@@ -163,6 +164,7 @@
 
         /**
          * Returns some exponentially distributed random values.
+         * https://en.wikipedia.org/wiki/Exponential_distribution
          *
          * @param {number} lambda Rate parameter.
          * @param {number=} n Number of values to return.
@@ -176,6 +178,7 @@
 
         /**
          * Returns some Pareto distributed random values.
+         * https://en.wikipedia.org/wiki/Pareto_distribution
          *
          * @param {number} xmin Scale parameter.
          * @param {number} alpha Shape parameter.
@@ -207,6 +210,7 @@
 
         /**
          * Returns some normally distributed random values.
+         * https://en.wikipedia.org/wiki/Normal_distribution
          *
          * @param {number} mu Mean (location).
          * @param {number} sigma Variance (squared scale).
@@ -222,7 +226,25 @@
         },
 
         /**
+         * Returns some log-normally distributed random values.
+         * https://en.wikipedia.org/wiki/Log-normal_distribution
+         *
+         * @param {number} mu Location parameter.
+         * @param {number} sigma Scale parameter.
+         * @param {number=} n Number of values to return.
+         * @returns {number|Array} Single value or array of random values.
+         */
+        lognormal: function(mu, sigma, n) {
+            return some(function () {
+                var u = Math.random(),
+                    v = Math.random();
+                return Math.exp(sigma * Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v) + mu);
+            }, n);
+        },
+
+        /**
          * Returns some Weibull distributed random values.
+         * https://en.wikipedia.org/wiki/Weibull_distribution
          *
          * @param {number} lambda Scale parameter.
          * @param {number} k Shape parameter.
@@ -232,6 +254,27 @@
         weibull: function(lambda, k, n) {
             return some(function() {
                 return lambda * Math.pow(-Math.log(Math.random()), 1/k);
+            }, n);
+        },
+
+        /**
+         * Returns some Poisson distributed random values.
+         * https://en.wikipedia.org/wiki/Poisson_distribution
+         *
+         * @param {number} lambda Mean of the distribution.
+         * @param {number=} n Number of values to return.
+         * @returns {number|Array} Single value or array of random values.
+         */
+        poisson: function(lambda, n) {
+            return some(function() {
+                var l = Math.exp(-lambda),
+                    k = 0,
+                    p = 1;
+                do {
+                    k++;
+                    p *= Math.random();
+                } while (p > l);
+                return k-1;
             }, n);
         }
     };
@@ -401,6 +444,7 @@
 
     /**
      * Generators of SVG related entities.
+     * https://developer.mozilla.org/en-US/docs/Web/SVG/Content_type
      */
     var svg = {
         /**
