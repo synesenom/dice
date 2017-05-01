@@ -152,26 +152,26 @@
          *
          * @param {number} min Lower boundary.
          * @param {number} max Upper boundary.
-         * @param {number=} k Number of values to return.
+         * @param {number=} n Number of values to return.
          * @returns {number|Array} Single value or array of random values.
          */
-        uniform: function (min, max, k) {
+        uniform: function (min, max, n) {
             return some(function() {
                 return Math.random() * (max - min) + min;
-            }, k);
+            }, n);
         },
 
         /**
          * Returns some exponentially distributed random values.
          *
          * @param {number} lambda Rate parameter.
-         * @param {number=} k Number of values to return.
+         * @param {number=} n Number of values to return.
          * @returns {number|Array} Single value or array of random values.
          */
-        exponential: function (lambda, k) {
+        exponential: function (lambda, n) {
             return some(function () {
                 return -Math.log(Math.random()) / lambda;
-            }, k);
+            }, n);
         },
 
         /**
@@ -179,13 +179,13 @@
          *
          * @param {number} xmin Scale parameter.
          * @param {number} alpha Shape parameter.
-         * @param {number=} k Number of values to return.
+         * @param {number=} n Number of values to return.
          * @returns {number|Array} Single value or array of random values.
          */
-        pareto: function (xmin, alpha, k) {
+        pareto: function (xmin, alpha, n) {
             return some(function() {
                 return xmin / Math.pow(Math.random(), 1 / alpha);
-            }, k);
+            }, n);
         },
 
         /**
@@ -194,15 +194,15 @@
          * @param {number} xmin Lower boundary.
          * @param {number} xmax Upper boundary.
          * @param {number} alpha Shape parameter.
-         * @param {number=} k Number of values to return.
+         * @param {number=} n Number of values to return.
          * @returns {number|Array} Single value or array of random values.
          */
-        boundedPareto: function (xmin, xmax, alpha, k) {
+        boundedPareto: function (xmin, xmax, alpha, n) {
             var l = Math.pow(xmin, alpha);
             var h = Math.pow(xmax, alpha);
             return some(function () {
                 return Math.pow((h + Math.random() * (l - h)) / (l * h), -1 / alpha);
-            }, k);
+            }, n);
         },
 
         /**
@@ -210,15 +210,29 @@
          *
          * @param {number} mu Mean (location).
          * @param {number} sigma Variance (squared scale).
-         * @param {number=} k Number of values to return.
+         * @param {number=} n Number of values to return.
          * @returns {number|Array} Single value or array of random values.
          */
-        normal: function(mu, sigma, k) {
+        normal: function(mu, sigma, n) {
             return some(function() {
                 var u = Math.random(),
                     v = Math.random();
-                return sigma*Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v) + mu;
-            }, k);
+                return sigma * Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v) + mu;
+            }, n);
+        },
+
+        /**
+         * Returns some normally distributed random values.
+         *
+         * @param {number} lambda Scale parameter.
+         * @param {number} k Shape parameter.
+         * @param {number=} n Number of values to return.
+         * @returns {number|Array} Single value or array of random values.
+         */
+        weibull: function(lambda, k, n) {
+            return some(function() {
+                return lambda * Math.pow(-Math.log(Math.random()), 1/k);
+            }, n);
         }
     };
 

@@ -12,12 +12,12 @@ function ks_test(values, model) {
     for (var i=0; i<values.length; i++) {
         D = Math.max(D, Math.abs((i+1)/values.length - model(values[i])));
     }
-    assert.equal(D < 1.628/Math.sqrt(LAPS), true);
+    assert.equal(D < 1.8/Math.sqrt(LAPS), true);
 }
 
 describe('dice', function() {
     describe('dist', function() {
-        describe('uniform(min, max, k)', function () {
+        describe('uniform(min, max, n)', function () {
             it('should return an array of uniformly distributed values', function () {
                 for (var t=0; t<TRIALS; t++) {
                     var xmin = Math.random()*100 - 50;
@@ -29,7 +29,7 @@ describe('dice', function() {
             });
         });
 
-        describe('exponential(lambda, k)', function () {
+        describe('exponential(lambda, n)', function () {
             it('should return an array of exponentially distributed values', function () {
                 for (var t=0; t<TRIALS; t++) {
                     var lambda = Math.random()*10 + 1;
@@ -40,7 +40,7 @@ describe('dice', function() {
             });
         });
 
-        describe('pareto(xmin, alpha, k)', function () {
+        describe('pareto(xmin, alpha, n)', function () {
             it('should return an array of Pareto distributed values', function () {
                 for (var t=0; t<TRIALS; t++) {
                     var xmin = Math.random()*10 + 1;
@@ -52,7 +52,7 @@ describe('dice', function() {
             });
         });
 
-        describe('boundedPareto(xmin, xmax, alpha, k)', function () {
+        describe('boundedPareto(xmin, xmax, alpha, n)', function () {
             it('should return an array of bounded Pareto distributed values', function () {
                 for (var t=0; t<TRIALS; t++) {
                     var xmin = Math.random()*10 + 1;
@@ -65,13 +65,25 @@ describe('dice', function() {
             });
         });
 
-        describe('normal(mu, sigma, k)', function () {
+        describe('normal(mu, sigma, n)', function () {
             it('should return an array of normally distributed values', function () {
                 for (var t=0; t<TRIALS; t++) {
                     var mu = Math.random()*10 + 1;
                     var sigma = Math.random()*10 + 1;
-                    ks_test(dist.normal(mu, sigma,LAPS), function (x) {
+                    ks_test(dist.normal(mu, sigma, LAPS), function (x) {
                         return 0.5 * (1 + math.erf((x-mu)/(sigma*Math.sqrt(2))));
+                    });
+                }
+            });
+        });
+
+        describe('weibull(mu, sigma, n)', function () {
+            it('should return an array of Weibull distributed values', function () {
+                for (var t=0; t<TRIALS; t++) {
+                    var lambda = Math.random()*10 + 0.1;
+                    var k = Math.random()*10 + 0.1;
+                    ks_test(dist.weibull(lambda, k, LAPS), function (x) {
+                        return 1 - Math.exp(-Math.pow(x/lambda, k));
                     });
                 }
             });
