@@ -222,7 +222,7 @@
         },
 
         /**
-         * Returns some normally distributed random values.
+         * Returns some Weibull distributed random values.
          *
          * @param {number} lambda Scale parameter.
          * @param {number} k Shape parameter.
