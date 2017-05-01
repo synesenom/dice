@@ -35,6 +35,7 @@
      * @param {function} generator Random generator to use.
      * @param {number=} k Number of values to generate.
      * @returns {number|string|Array} Single value or array of values.
+     * @private
      */
     function some(generator, k) {
         if (k === null || k === undefined || k < 2)
@@ -143,76 +144,228 @@
     };
 
     /**
+     * Several well-known distributions.
+     */
+    var dist = {
+        /**
+         * Returns some uniformly distributed random values.
+         *
+         * @param {number} min Lower boundary.
+         * @param {number} max Upper boundary.
+         * @param {number=} k Number of values to return.
+         * @returns {number|Array} Single value or array of random values.
+         */
+        uniform: function (min, max, k) {
+            return some(function() {
+                return Math.random() * (max - min) + min;
+            }, k);
+        },
+
+        /**
+         * Returns some exponentially distributed random values.
+         *
+         * @param {number} lambda Rate parameter.
+         * @param {number=} k Number of values to return.
+         * @returns {number|Array} Single value or array of random values.
+         */
+        exponential: function (lambda, k) {
+            return some(function () {
+                return -Math.log(Math.random()) / lambda;
+            }, k);
+        },
+
+        /**
+         * Returns some Pareto distributed random values.
+         *
+         * @param {number} xmin Scale parameter.
+         * @param {number} alpha Shape parameter.
+         * @param {number=} k Number of values to return.
+         * @returns {number|Array} Single value or array of random values.
+         */
+        pareto: function (xmin, alpha, k) {
+            return some(function() {
+                return xmin / Math.pow(Math.random(), 1 / alpha);
+            }, k);
+        },
+
+        /**
+         * Returns some bounded Pareto distributed random values.
+         *
+         * @param {number} xmin Lower boundary.
+         * @param {number} xmax Upper boundary.
+         * @param {number} alpha Shape parameter.
+         * @param {number=} k Number of values to return.
+         * @returns {number|Array} Single value or array of random values.
+         */
+        boundedPareto: function (xmin, xmax, alpha, k) {
+            var l = Math.pow(xmin, alpha);
+            var h = Math.pow(xmax, alpha);
+            return some(function () {
+                return Math.pow((h + Math.random() * (l - h)) / (l * h), -1 / alpha);
+            }, k);
+        }
+    };
+
+    /**
      * Generators of CSS related entities.
      */
     var css = {
         /**
          * Returns a random CSS <integer> string.
          *
-         * @returns {string} Random integer.
+         * @returns {object} An object with properties i (raw value) and o (string).
          */
         integer: function() {
-            return (core.char("+- ") + core.int(10)).trim();
+            var r = (core.char("+- ") + core.int(10)).trim();
+            return {
+                i: parseInt(r),
+                o: r
+            };
         },
 
         /**
          * Returns a random CSS <number> string.
          *
-         * @returns {string} Random number.
+         * @returns {object} An object with properties i (raw value) and o (string).
          */
         number: function() {
-            if (Math.random() < 1/2) {
-                return "" + this.integer();
-            } else {
-                return (core.char("+- ")
-                    + (Math.random() < 0.5 ? core.int(100) : "")
-                    + "."
-                    + core.int(100)
-                ).trim();
-            }
+            var r = (core.char("+- ") + (Math.random() < 0.5 ? core.int(100) : "") + "." + core.int(100)).trim();
+            return {
+                i: parseFloat(r),
+                o: r
+            };
         },
 
         /**
          * Returns a random CSS <length> string.
          *
-         * @param {boolean=} positive Whether to generate strictly positive length.
-         * @returns {string} Random length.
+         * @returns {object} An object with properties i (raw value) and o (string).
          */
-        length: function(positive) {
-            var length = this.number() + core.choice(["em", "ex", "px", "in", "cm", "mm", "pt", "pc", "%"]);
-            return (positive && length.charAt(0) == "-") ? length.replace("-", "") : length;
-        },
-
-        /**
-         * Returns a random CSS <color> string.
-         *
-         * @returns {string} Random color.
-         */
-        color: function() {
-            if (Math.random() < 1/7)
-                return "#" + core.char("0123456789abcdef", 3).join("");
-            if (Math.random() < 1/6)
-                return "#" + core.char("0123456789abcdef", 6).join("");
-            if (Math.random() < 1/5)
-                return core.choice(["red", "green", "blue"]);
-            if (Math.random() < 1/4)
-                return "rgb(" + core.int(0, 255, 3).join(",") + ")";
-            if (Math.random() < 1/3)
-                return "rgb(" + core.int(0, 255, 3).join(",") + "," + core.float() + ")";
-            if (Math.random() < 1/2)
-                return "rgb(" + core.int(0, 100, 3).join("%,") + "%)";
-            else
-                return "rgb(" + core.int(0, 100, 3).join("%,") + "%," + core.float()
-                    + ")";
+        length: function() {
+            var o = ((Math.random() < 0.5 ? core.int(100) : "") + "." + core.int(100)).trim();
+            var i = parseFloat(o);
+            if (parseFloat(o) != 0) {
+                o += core.choice(["em", "ex", "px", "in", "cm", "mm", "pt", "pc", "%"]);
+            } else {
+                o = "0";
+            }
+            return {
+                i: i,
+                o: o
+            };
         },
 
         /**
          * Returns a random CSS <opacity-value> string.
          *
-         * @returns {string} Random opacity-value.
+         * @returns {object} An object with properties i (raw value) and o (string).
          */
         opacityValue: function() {
-            return "" + core.float();
+            var r = this.number();
+            return {
+                i: Math.min(1, Math.max(0, r.i)),
+                o: r.o
+            };
+        },
+
+        /**
+         * Returns a random CSS <color> string.
+         *
+         * @returns {object} An object with properties i (raw value) and o (string).
+         */
+        color: function() {
+            var i = {
+                r: core.int(255),
+                g: core.int(255),
+                b: core.int(255)
+            };
+
+            // 6 digit hex
+            if (Math.random() < 1/5) {
+                return {
+                    i: i,
+                    o: "#" + Math.floor(i.r/16).toString(16) + (i.r%16).toString(16)
+                    + Math.floor(i.g/16).toString(16) + (i.g%16).toString(16)
+                    + Math.floor(i.b/16).toString(16) + (i.b%16).toString(16)
+                };
+            }
+            // 3 digits hex
+            if (Math.random() < 1/4) {
+                i = {
+                    r: Math.floor(i.r/16),
+                    g: Math.floor(i.g/16),
+                    b: Math.floor(i.b/16)
+                };
+                return {
+                    i: i,
+                    o: "#" + i.r.toString(16) + i.g.toString(16) + i.b.toString(16)
+                };
+            }
+            // rgb with integers
+            if (Math.random() < 1/3) {
+                return {
+                    i: i,
+                    o: "rgb(" + i.r + "," + i.g + "," + i.b + ")"
+                };
+            }
+            // rgb with percentages
+            if (Math.random() < 1/2) {
+                return {
+                    i: i,
+                    o: "rgb(" + Math.floor(i.r/2.55) + "%," + Math.floor(i.g/2.55) + "%," + Math.floor(i.b/2.55) + "%)"
+                };
+            } else {
+                var index = core.int(146);
+                var o = ["aliceblue", "antiquewhite", "aqua", "aquamarine", "azure", "beige", "bisque", "black",
+                        "blanchedalmond", "blue", "blueviolet", "brown", "burlywood", "cadetblue", "chartreuse",
+                        "chocolate", "coral", "cornflowerblue", "cornsilk", "crimson", "cyan", "darkblue", "darkcyan",
+                        "darkgoldenrod", "darkgray", "darkgreen", "darkgrey", "darkkhaki", "darkmagenta",
+                        "darkolivegreen", "darkorange", "darkorchid", "darkred", "darksalmon", "darkseagreen",
+                        "darkslateblue", "darkslategray", "darkslategrey", "darkturquoise", "darkviolet", "deeppink",
+                        "deepskyblue", "dimgray", "dimgrey", "dodgerblue", "firebrick", "floralwhite", "forestgreen",
+                        "fuchsia", "gainsboro", "ghostwhite", "gold", "goldenrod", "gray", "green", "greenyellow",
+                        "grey", "honeydew", "hotpink", "indianred", "indigo", "ivory", "khaki", "lavender",
+                        "lavenderblush", "lawngreen", "lemonchiffon", "lightblue", "lightcoral", "lightcyan",
+                        "lightgoldenrodyellow", "lightgray", "lightgreen", "lightgrey", "lightpink", "lightsalmon",
+                        "lightseagreen", "lightskyblue", "lightslategray", "lightslategrey", "lightsteelblue",
+                        "lightyellow", "lime", "limegreen", "linen", "magenta", "maroon", "mediumaquamarine",
+                        "mediumblue", "mediumorchid", "mediumpurple", "mediumseagreen", "mediumslateblue",
+                        "mediumspringgreen", "mediumturquoise", "mediumvioletred", "midnightblue", "mintcream",
+                        "mistyrose", "moccasin", "navajowhite", "navy", "oldlace", "olive", "olivedrab", "orange",
+                        "orangered", "orchid", "palegoldenrod", "palegreen", "paleturquoise", "palevioletred",
+                        "papayawhip", "peachpuff", "peru", "pink", "plum", "powderblue", "purple", "red", "rosybrown",
+                        "royalblue", "saddlebrown", "salmon", "sandybrown", "seagreen", "seashell", "sienna", "silver",
+                        "skyblue", "slateblue", "slategray", "slategrey", "snow", "springgreen", "steelblue", "tan",
+                        "teal", "thistle", "tomato", "turquoise", "violet", "wheat", "white", "whitesmoke", "yellow",
+                        "yellowgreen"][index];
+                var c = ["#F0F8FF", "#FAEBD7", "#00FFFF", "#7FFFD4", "#F0FFFF", "#F5F5DC", "#FFE4C4", "#000000",
+                        "#FFEBCD", "#0000FF", "#8A2BE2", "#A52A2A", "#DEB887", "#5F9EA0", "#7FFF00", "#D2691E",
+                        "#FF7F50", "#6495ED", "#FFF8DC", "#DC143C", "#00FFFF", "#00008B", "#008B8B", "#B8860B",
+                        "#A9A9A9", "#006400", "#A9A9A9", "#BDB76B", "#8B008B", "#556B2F", "#FF8C00", "#9932CC",
+                        "#8B0000", "#E9967A", "#8FBC8F", "#483D8B", "#2F4F4F", "#2F4F4F", "#00CED1", "#9400D3",
+                        "#FF1493", "#00BFFF", "#696969", "#696969", "#1E90FF", "#B22222", "#FFFAF0", "#228B22",
+                        "#FF00FF", "#DCDCDC", "#F8F8FF", "#FFD700", "#DAA520", "#808080", "#008000", "#ADFF2F",
+                        "#808080", "#F0FFF0", "#FF69B4", "#CD5C5C", "#4B0082", "#FFFFF0", "#F0E68C", "#E6E6FA",
+                        "#FFF0F5", "#7CFC00", "#FFFACD", "#ADD8E6", "#F08080", "#E0FFFF", "#FAFAD2", "#D3D3D3",
+                        "#90EE90", "#D3D3D3", "#FFB6C1", "#FFA07A", "#20B2AA", "#87CEFA", "#778899", "#778899",
+                        "#B0C4DE", "#FFFFE0", "#00FF00", "#32CD32", "#FAF0E6", "#FF00FF", "#800000", "#66CDAA",
+                        "#0000CD", "#BA55D3", "#9370DB", "#3CB371", "#7B68EE", "#00FA9A", "#48D1CC", "#C71585",
+                        "#191970", "#F5FFFA", "#FFE4E1", "#FFE4B5", "#FFDEAD", "#000080", "#FDF5E6", "#808000",
+                        "#6B8E23", "#FFA500", "#FF4500", "#DA70D6", "#EEE8AA", "#98FB98", "#AFEEEE", "#DB7093",
+                        "#FFEFD5", "#FFDAB9", "#CD853F", "#FFC0CB", "#DDA0DD", "#B0E0E6", "#800080", "#FF0000",
+                        "#BC8F8F", "#4169E1", "#8B4513", "#FA8072", "#F4A460", "#2E8B57", "#FFF5EE", "#A0522D",
+                        "#C0C0C0", "#87CEEB", "#6A5ACD", "#708090", "#708090", "#FFFAFA", "#00FF7F", "#4682B4",
+                        "#D2B48C", "#008080", "#D8BFD8", "#FF6347", "#40E0D0", "#EE82EE", "#F5DEB3", "#FFFFFF",
+                        "#F5F5F5", "#FFFF00", "#9ACD32"][index].replace('#', '');
+                return {
+                    i: {
+                        r: parseInt(c[0] + c[1], 16),
+                        g: parseInt(c[2] + c[3], 16),
+                        b: parseInt(c[4] + c[5], 16)
+                    },
+                    o: o
+                };
+            }
         }
     };
 
@@ -251,12 +404,11 @@
         /**
          * Returns a random SVG <length> string.
          *
-         * @param positive Whether to generate strictly positive length.
          * @returns {string} Random length.
          */
-        length: function(positive) {
+        length: function() {
             var length = this.number() + core.choice(["", "em", "ex", "px", "in", "cm", "mm", "pt", "pc", "%"]);
-            return (positive && length.charAt(0) == "-") ? length.replace("-", "") : length;
+            return length.charAt(0) == "-" ? length.replace("-", "") : length;
         },
 
         /**
@@ -381,58 +533,6 @@
                 }
             }
             return path.trim();
-        }
-    };
-
-    var dist = {
-        /**
-         * Returns some uniformly distributed random values.
-         *
-         * @param {number} min Lower boundary.
-         * @param {number} max Upper boundary.
-         * @param {number=} k Number of values to return.
-         * @returns {number|Array} Single value or array of random values.
-         */
-        uniform: function (min, max, k) {
-            return some(function() {
-                return Math.random() * (max - min) + min;
-            }, k);
-        },
-
-        /**
-         * Returns some exponentially distributed random values.
-         *
-         * @param {number} lambda Rate parameter.
-         * @param {number=} k Number of values to return.
-         * @returns {number|Array} Single value or array of random values.
-         */
-        exponential: function (lambda, k) {
-            return some(function () {
-                return -Math.log(Math.random()) / lambda;
-            }, k);
-        },
-
-        /**
-         * Returns some Pareto distributed random values.
-         *
-         * @param {number} xmin Scale parameter.
-         * @param {number} alpha Shape parameter.
-         * @param {number=} k Number of values to return.
-         * @returns {number|Array} Single value or array of random values.
-         */
-        pareto: function (xmin, alpha, k) {
-            return some(function() {
-                return xmin / Math.pow(Math.random(), 1 / alpha);
-            }, k);
-        },
-
-        // TODO unit test
-        boundedPareto: function (xmin, xmax, alpha, k) {
-            var l = Math.pow(xmin, alpha);
-            var h = Math.pow(xmax, alpha);
-            return some(function () {
-                return Math.pow((h + Math.random() * (l - h)) / (l * h), -1 / alpha);
-            }, k);
         }
     };
 /*        custom: function() {

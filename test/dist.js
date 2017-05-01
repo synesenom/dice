@@ -39,7 +39,7 @@ describe('dice', function() {
             });
         });
 
-        describe('paretor(xmin, alpha, k)', function () {
+        describe('pareto(xmin, alpha, k)', function () {
             it('should return an array of Pareto distributed values', function () {
                 for (var t=0; t<TRIALS; t++) {
                     var xmin = Math.random()*10 + 1;
