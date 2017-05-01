@@ -203,6 +203,22 @@
             return some(function () {
                 return Math.pow((h + Math.random() * (l - h)) / (l * h), -1 / alpha);
             }, k);
+        },
+
+        /**
+         * Returns some normally distributed random values.
+         *
+         * @param {number} mu Mean (location).
+         * @param {number} sigma Variance (squared scale).
+         * @param {number=} k Number of values to return.
+         * @returns {number|Array} Single value or array of random values.
+         */
+        normal: function(mu, sigma, k) {
+            return some(function() {
+                var u = Math.random(),
+                    v = Math.random();
+                return sigma*Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v) + mu;
+            }, k);
         }
     };
 

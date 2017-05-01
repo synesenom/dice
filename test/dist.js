@@ -1,4 +1,5 @@
 var assert = require('assert');
+var math = require('mathjs');
 var dist = require('../src/dice').dist;
 
 var TRIALS = 1;
@@ -59,6 +60,18 @@ describe('dice', function() {
                     var alpha = Math.random()*5 + 1;
                     ks_test(dist.boundedPareto(xmin, xmax, alpha, LAPS), function (x) {
                         return (1 - Math.pow(xmin / x, alpha)) / (1 - Math.pow(xmin / xmax, alpha));
+                    });
+                }
+            });
+        });
+
+        describe('normal(mu, sigma, k)', function () {
+            it('should return an array of normally distributed values', function () {
+                for (var t=0; t<TRIALS; t++) {
+                    var mu = Math.random()*10 + 1;
+                    var sigma = Math.random()*10 + 1;
+                    ks_test(dist.normal(mu, sigma,LAPS), function (x) {
+                        return 0.5 * (1 + math.erf((x-mu)/(sigma*Math.sqrt(2))));
                     });
                 }
             });
