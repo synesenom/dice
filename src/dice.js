@@ -140,6 +140,18 @@
                 values[l] = values[i];
                 values[i] = temp;
             }
+        },
+
+        /**
+         * Flips a coin and returns the associated head/tail values accordingly.
+         *
+         * @param {number} p Bias (probability of head).
+         * @param {object} head Head value.
+         * @param {object} tail Tail value.
+         * @returns {object} Object of head/tail values.
+         */
+        coin: function(p, head, tail) {
+            return Math.random() < p ? head : tail;
         }
     };
 
@@ -284,38 +296,38 @@
      */
     var css = {
         /**
-         * Returns a random CSS <integer> string.
+         * Returns a random CSS <integer>.
          *
          * @returns {object} An object with properties i (raw value) and o (string).
          */
         integer: function() {
-            var r = (core.char("+- ") + core.int(10)).trim();
+            var o = core.char("+- ") + core.int(10);
             return {
-                i: parseInt(r),
-                o: r
+                i: parseInt(o),
+                o: o.trim()
             };
         },
 
         /**
-         * Returns a random CSS <number> string.
+         * Returns a random CSS <number>.
          *
          * @returns {object} An object with properties i (raw value) and o (string).
          */
         number: function() {
-            var r = (core.char("+- ") + (Math.random() < 0.5 ? core.int(100) : "") + "." + core.int(100)).trim();
+            var o = core.char("+- ") + core.coin(0.5, core.int(100), "") + "." + core.int(100);
             return {
-                i: parseFloat(r),
-                o: r
+                i: parseFloat(o),
+                o: o.trim()
             };
         },
 
         /**
-         * Returns a random CSS <length> string.
+         * Returns a random CSS <length>.
          *
          * @returns {object} An object with properties i (raw value) and o (string).
          */
         length: function() {
-            var o = ((Math.random() < 0.5 ? core.int(100) : "") + "." + core.int(100)).trim();
+            var o = core.coin(0.5, core.int(100), "") + "." + core.int(100);
             var i = parseFloat(o);
             if (parseFloat(o) != 0) {
                 o += core.choice(["em", "ex", "px", "in", "cm", "mm", "pt", "pc", "%"]);
@@ -324,12 +336,12 @@
             }
             return {
                 i: i,
-                o: o
+                o: o.trim()
             };
         },
 
         /**
-         * Returns a random CSS <opacity-value> string.
+         * Returns a random CSS <opacity-value>.
          *
          * @returns {object} An object with properties i (raw value) and o (string).
          */
@@ -342,7 +354,7 @@
         },
 
         /**
-         * Returns a random CSS <color> string.
+         * Returns a random CSS <color>.
          *
          * @returns {object} An object with properties i (raw value) and o (string).
          */
@@ -448,41 +460,43 @@
      */
     var svg = {
         /**
-         * Returns a random SVG <integer> string.
+         * Returns a random SVG <integer>.
          *
-         * @returns {string} Random integer.
+         * @returns {object} An object with properties i (raw value) and o (string).
          */
         integer: function() {
             return css.integer();
         },
 
         /**
-         * Returns a random SVG <number> string.
+         * Returns a random SVG <number>.
          *
-         * @returns {string} Random number.
+         * @returns {object} An object with properties i (raw value) and o (string).
          */
         number: function() {
-            if (Math.random() < 0.5) {
-                return this.integer()
-                    + (Math.random() < 0.5 ? core.char("Ee") + this.integer() : "");
-            } else {
-                return (core.char("+- ")
-                    + (Math.random() < 0.5 ? core.int(100) : "")
-                    + "."
-                    + core.int(100)
-                    + (Math.random() < 0.5 ? core.char("Ee") + this.integer() : "")
-                ).trim();
-            }
+            var o = core.char("+- ")
+                + core.coin(0.5, core.int(10) + ".", "")
+                + core.int(1, 1000)
+                + core.coin(0.5, core.char("Ee") + core.int(4), "");
+            return  {
+                i: parseFloat(o),
+                o: o.trim()
+            };
         },
 
         /**
-         * Returns a random SVG <length> string.
+         * Returns a random SVG <length>.
          *
-         * @returns {string} Random length.
+         * @returns {object} An object with properties i (raw value) and o (string).
          */
         length: function() {
-            var length = this.number() + core.choice(["", "em", "ex", "px", "in", "cm", "mm", "pt", "pc", "%"]);
-            return length.charAt(0) == "-" ? length.replace("-", "") : length;
+            var r = this.number();
+            if (r.o.charAt(0) == "-")
+                r.o.replace("-", "");
+            return {
+                i: r.i,
+                o: r.o + core.choice(["", "em", "ex", "px", "in", "cm", "mm", "pt", "pc", "%"])
+            };
         },
 
         /**

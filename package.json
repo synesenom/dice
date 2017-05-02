@@ -1,7 +1,35 @@
 {
   "name": "dice",
   "version": "0.0.1",
+  "description": "Library for generating various random entities",
+  "main": "dice.min.js",
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {
+    "mocha": "^3.2.0",
+    "jstat": "^1.5.3",
+    "mathjs": "^3.12.2",
+    "uglify-js": "^2.8.22"
+  },
   "scripts": {
     "test": "mocha --recursive"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://synesenom@github.com/synesenom/dice.git"
+  },
+  "keywords": [
+    "random",
+    "generator",
+    "distributions",
+    "css",
+    "svg"
+  ],
+  "author": "Enys Mones <enys.mones@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/synesenom/dice/issues"
+  },
+  "homepage": "https://github.com/synesenom/dice#readme"
 }

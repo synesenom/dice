@@ -3,7 +3,7 @@ var utils = require('../test/test-utils').test_uils;
 var core = require('../src/dice').core;
 
 var TRIALS = 1;
-var LAPS = 10000;
+var LAPS = 1000;
 
 function add(dist, value) {
     if (!dist.hasOwnProperty(value))
@@ -188,7 +188,7 @@ describe('dice', function() {
             });
         });
 
-        describe('choice(values, k)', function() {
+        describe('choice', function() {
             it('should return some random elements of an array', function() {
                 for (var trial=0; trial<TRIALS; trial++) {
                     var values = ['a', 'b', 'c'];
@@ -217,7 +217,7 @@ describe('dice', function() {
             });
         });
 
-        describe('char(string, k)', function() {
+        describe('char', function() {
             it('should return some random characters of a string', function() {
                 for (var trial=0; trial<TRIALS; trial++) {
                     var string = "abcdefghijkl51313#^!#?><;!-_=+.,/:{}()";
@@ -237,7 +237,7 @@ describe('dice', function() {
             });
         });
 
-        describe('shuffle(values)', function() {
+        describe('shuffle', function() {
             it('should shuffle an array', function() {
                 for (var trial=0; trial<TRIALS; trial++) {
                     var values = [];
@@ -260,6 +260,24 @@ describe('dice', function() {
                             assert.equal(true, p[i] > 0);
                     });
                 }
+            });
+        });
+
+        describe('coin', function() {
+            it('should return head with some probability', function() {
+                utils.trials(function() {
+                    var p = Math.random();
+                    var values = [];
+                    for (var lap=0; lap<LAPS; lap++) {
+                        var r = core.coin(p, 0, 1);
+                        values.push(r);
+                    }
+
+                    // Distribution is uniform
+                    return utils.chi_test(values, function(x) {
+                        return x == 0 ? p : 1-p;
+                    }, 0);
+                });
             });
         });
     });

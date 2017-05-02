@@ -5,7 +5,7 @@ var LAPS = 10000;
 
 describe("dice", function() {
     describe("css", function() {
-        describe("integer()", function () {
+        describe("integer", function () {
             it("should return a random CSS <integer>: string is valid CSS <integer>", function () {
                 for (var lap = 0; lap < LAPS; lap++) {
                     var r = css.integer();
@@ -28,7 +28,7 @@ describe("dice", function() {
             });
         });
 
-        describe("number()", function () {
+        describe("number", function () {
             it("should return a random CSS <number>: string is valid CSS <number>", function () {
                 for (var lap = 0; lap < LAPS; lap++) {
                     var r = css.number();
@@ -51,7 +51,7 @@ describe("dice", function() {
             });
         });
 
-        describe("length()", function () {
+        describe("length", function () {
             it("should return a random CSS <length>: string is valid CSS <length>", function () {
                 for (var lap = 0; lap < LAPS; lap++) {
                     var r = css.length();
@@ -74,7 +74,7 @@ describe("dice", function() {
             });
         });
 
-        describe("opacityValue()", function () {
+        describe("opacityValue", function () {
             it("should return a random CSS <opacity-value>: string is valid CSS <opacity-value>", function () {
                 for (var lap = 0; lap < LAPS; lap++) {
                     var r = css.opacityValue();
@@ -104,7 +104,7 @@ describe("dice", function() {
             });
         });
 
-        describe("color()", function () {
+        describe("color", function () {
             it("should return a random CSS <color>: string is valid CSS <color>", function () {
                 var re = new RegExp("^(#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})" +
                     "|rgb\\(\\d+%?,\\d+%?,\\d+%?\\))$");
@@ -158,20 +158,6 @@ describe("dice", function() {
                             }
                         }
                     }
-                }
-            });
-        });
-
-        // TODO test color!
-        return;
-
-        describe("color()", function () {
-            it("should return a random CSS <color> string", function () {
-                for (var lap = 0; lap < LAPS; lap++) {
-                    var re = new RegExp("^(#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})" +
-                        "|(red|green|blue)" +
-                        "|rgb\\(\\d+%?,\\d+%?,\\d+%?(,\\d*.?\\d+)?\\))$");
-                    assert.equal(true, re.test(css.color()));
                 }
             });
         });
