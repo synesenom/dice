@@ -1,5 +1,6 @@
 /**
  * Class for generating various random entities.
+ * @module dice
  */
 // UMD
 (function (global, factory) {
@@ -18,6 +19,8 @@
      * The main random number generator.
      * If min > max, a random number in (max, min) is generated.
      *
+     * @method r
+     * @memberOf dice
      * @param {number} min Lower boundary.
      * @param {number} max Upper boundary.
      * @returns {number} Random number in (min, max) if min < max, otherwise a random number in (max, min).
@@ -30,11 +33,13 @@
     }
 
     /**
-     * Generates a single value or an array of values.
+     * Runs a generator method once or several times to return a single value or an array of values.
      *
+     * @method some
+     * @memberOf dice
      * @param {function} generator Random generator to use.
      * @param {number=} k Number of values to generate.
-     * @returns {number|string|Array} Single value or array of values.
+     * @returns {(number|string|Array)} Single value or array of values.
      * @private
      */
     function some(generator, k) {
@@ -49,21 +54,26 @@
     }
 
     /**
-     * Core functionality, basic uniform generators.
+     * Core functionality, basic uniform generators and array manipulators.
+     *
+     * @namespace core
+     * @memberOf dice
      */
     var core = {
         /**
-         * Generates a random float in (min, max).
+         * Generates some uniformly distributed random floats in (min, max).
          * If min > max, a random number in (max, min) is generated.
          * If max is not given, a random number in (0, min) is generated.
          * If no arguments are given, returns a random float in (0, 1).
          *
+         * @method float
+         * @memberOf dice.core
          * @param {number=} min Lower boundary, or upper if max is not given.
          * @param {number=} max Upper boundary.
-         * @param {number=} k Number of floats to return.
-         * @returns {number|Array} Random float in (min, max) if min < max, otherwise a random float in (max, min). If max
+         * @param {number=} k Number of floats to generate.
+         * @returns {(number|Array)} Random float in (min, max) if min < max, otherwise a random float in (max, min). If max
          * is not specified, random float in (0, min) if min > 0, otherwise in (min, 0). If none is specified, a random
-         * float in (0, 1). If k is specified, an Array of floats between min and max is returned.
+         * float in (0, 1). If k is specified, an array of floats between min and max is returned.
          */
         float: function (min, max, k) {
             if (arguments.length == 0)
@@ -76,14 +86,16 @@
         },
 
         /**
-         * Generates a random integer in (min, max).
+         * Generates some uniformly distributed random integers in (min, max).
          * If min > max, a random number in (max, min) is generated.
          * If max is not given, a random number in (0, min) is generated.
          *
+         * @method int
+         * @memberOf dice.core
          * @param {number} min Lower boundary.
          * @param {number=} max Upper boundary.
-         * @param {number=} k Number of integers to return.
-         * @returns {number|Array} Random integer in (min, max) if min < max, otherwise a random integer in (max, min). If max
+         * @param {number=} k Number of integers to generate.
+         * @returns {(number|Array)} Random integer in (min, max) if min < max, otherwise a random integer in (max, min). If max
          * is not specified, random integer in (0, min) if min > 0, otherwise in (min, 0). If k is specified, an Array
          * of integers between min and max is returned.
          */
@@ -96,8 +108,10 @@
         },
 
         /**
-         * Selects a random element from an array.
+         * Selects some elements from an array randomly with uniform distribution.
          *
+         * @method choice
+         * @memberOf dice.core
          * @param {Array} values Array of values.
          * @param {number=} k Number of characters to sample.
          * @returns {object} Random element if k is not given or less than 2, an array of random elements otherwise,
@@ -113,8 +127,10 @@
         },
 
         /**
-         * Samples some random characters of a string.
+         * Selects some characters from a string randomly with uniform distribution.
          *
+         * @method char
+         * @memberOf dice.core
          * @param {string} string String to select character from.
          * @param {number=} k Number of characters to sample.
          * @returns {object} Random character if k is not given or less than 2, an array of random characters otherwise.
@@ -128,8 +144,10 @@
         },
 
         /**
-         * Shuffles an array using the Fisher--Yates algorithm.
+         * Shuffles the elements of an array using the Fisher--Yates algorithm.
          *
+         * @method shuffle
+         * @memberOf dice.core
          * @param {Array} values Array of values to shuffle.
          */
         shuffle: function (values) {
@@ -143,8 +161,10 @@
         },
 
         /**
-         * Flips a coin and returns the associated head/tail values accordingly.
+         * Flips a biased coin and returns the associated head/tail values accordingly.
          *
+         * @method coin
+         * @memberOf dice.core
          * @param {number} p Bias (probability of head).
          * @param {object} head Head value.
          * @param {object} tail Tail value.
@@ -156,17 +176,22 @@
     };
 
     /**
-     * Several well-known distributions.
+     * A bunch of generators for well-known distributions.
+     *
+     * @namespace dist
+     * @memberOf dice
      */
     var dist = {
         /**
-         * Returns some uniformly distributed random values.
+         * Generates some uniformly distributed random values.
          * https://en.wikipedia.org/wiki/Uniform_distribution_(continuous)
          *
+         * @method uniform
+         * @memberOf dice.dist
          * @param {number} min Lower boundary.
          * @param {number} max Upper boundary.
          * @param {number=} n Number of values to return.
-         * @returns {number|Array} Single value or array of random values.
+         * @returns {(number|Array)} Single value or array of random values.
          */
         uniform: function (min, max, n) {
             return some(function() {
@@ -178,6 +203,8 @@
          * Returns some exponentially distributed random values.
          * https://en.wikipedia.org/wiki/Exponential_distribution
          *
+         * @method exponential
+         * @memberOf dice.dist
          * @param {number} lambda Rate parameter.
          * @param {number=} n Number of values to return.
          * @returns {number|Array} Single value or array of random values.
@@ -192,10 +219,12 @@
          * Returns some Pareto distributed random values.
          * https://en.wikipedia.org/wiki/Pareto_distribution
          *
+         * @method pareto
+         * @memberOf dice.dist
          * @param {number} xmin Scale parameter.
          * @param {number} alpha Shape parameter.
          * @param {number=} n Number of values to return.
-         * @returns {number|Array} Single value or array of random values.
+         * @returns {(number|Array)} Single value or array of random values.
          */
         pareto: function (xmin, alpha, n) {
             return some(function() {
@@ -205,12 +234,15 @@
 
         /**
          * Returns some bounded Pareto distributed random values.
+         * https://en.wikipedia.org/wiki/Pareto_distribution#Bounded_Pareto_distribution
          *
+         * @method boundedPareto
+         * @memberOf dice.dist
          * @param {number} xmin Lower boundary.
          * @param {number} xmax Upper boundary.
          * @param {number} alpha Shape parameter.
          * @param {number=} n Number of values to return.
-         * @returns {number|Array} Single value or array of random values.
+         * @returns {(number|Array)} Single value or array of random values.
          */
         boundedPareto: function (xmin, xmax, alpha, n) {
             var l = Math.pow(xmin, alpha);
@@ -224,10 +256,12 @@
          * Returns some normally distributed random values.
          * https://en.wikipedia.org/wiki/Normal_distribution
          *
+         * @method normal
+         * @memberOf dice.dist
          * @param {number} mu Mean (location).
          * @param {number} sigma Variance (squared scale).
          * @param {number=} n Number of values to return.
-         * @returns {number|Array} Single value or array of random values.
+         * @returns {(number|Array)} Single value or array of random values.
          */
         normal: function(mu, sigma, n) {
             return some(function() {
@@ -241,10 +275,12 @@
          * Returns some log-normally distributed random values.
          * https://en.wikipedia.org/wiki/Log-normal_distribution
          *
+         * @method lognormal
+         * @memberOf dice.dist
          * @param {number} mu Location parameter.
          * @param {number} sigma Scale parameter.
          * @param {number=} n Number of values to return.
-         * @returns {number|Array} Single value or array of random values.
+         * @returns {(number|Array)} Single value or array of random values.
          */
         lognormal: function(mu, sigma, n) {
             return some(function () {
@@ -258,10 +294,12 @@
          * Returns some Weibull distributed random values.
          * https://en.wikipedia.org/wiki/Weibull_distribution
          *
+         * @method weibull
+         * @memberOf dice.dist
          * @param {number} lambda Scale parameter.
          * @param {number} k Shape parameter.
          * @param {number=} n Number of values to return.
-         * @returns {number|Array} Single value or array of random values.
+         * @returns {(number|Array)} Single value or array of random values.
          */
         weibull: function(lambda, k, n) {
             return some(function() {
@@ -273,9 +311,11 @@
          * Returns some Poisson distributed random values.
          * https://en.wikipedia.org/wiki/Poisson_distribution
          *
+         * @method poisson
+         * @memberOf dice.dist
          * @param {number} lambda Mean of the distribution.
          * @param {number=} n Number of values to return.
-         * @returns {number|Array} Single value or array of random values.
+         * @returns {(number|Array)} Single value or array of random values.
          */
         poisson: function(lambda, n) {
             return some(function() {
@@ -293,11 +333,16 @@
 
     /**
      * Generators of CSS related entities.
+     *
+     * @namespace css
+     * @memberOf dice
      */
     var css = {
         /**
-         * Returns a random CSS <integer>.
+         * Returns a random CSS integer.
          *
+         * @method integer
+         * @memberOf dice.css
          * @returns {object} An object with properties i (raw value) and o (string).
          */
         integer: function() {
@@ -309,8 +354,10 @@
         },
 
         /**
-         * Returns a random CSS <number>.
+         * Returns a random CSS number.
          *
+         * @method number
+         * @memberOf dice.css
          * @returns {object} An object with properties i (raw value) and o (string).
          */
         number: function() {
@@ -322,8 +369,10 @@
         },
 
         /**
-         * Returns a random CSS <length>.
+         * Returns a random CSS length.
          *
+         * @method length
+         * @memberOf dice.css
          * @returns {object} An object with properties i (raw value) and o (string).
          */
         length: function() {
@@ -341,8 +390,10 @@
         },
 
         /**
-         * Returns a random CSS <opacity-value>.
+         * Returns a random CSS opacity-value.
          *
+         * @method opacityValue
+         * @memberOf dice.css
          * @returns {object} An object with properties i (raw value) and o (string).
          */
         opacityValue: function() {
@@ -354,8 +405,10 @@
         },
 
         /**
-         * Returns a random CSS <color>.
+         * Returns a random CSS color.
          *
+         * @method color
+         * @memberOf dice.css
          * @returns {object} An object with properties i (raw value) and o (string).
          */
         color: function() {
@@ -457,11 +510,16 @@
     /**
      * Generators of SVG related entities.
      * https://developer.mozilla.org/en-US/docs/Web/SVG/Content_type
+     *
+     * @namespace svg
+     * @memberOf dice
      */
     var svg = {
         /**
-         * Returns a random SVG <integer>.
+         * Returns a random SVG integer.
          *
+         * @method integer
+         * @memberOf dice.svg
          * @returns {object} An object with properties i (raw value) and o (string).
          */
         integer: function() {
@@ -469,8 +527,10 @@
         },
 
         /**
-         * Returns a random SVG <number>.
+         * Returns a random SVG number.
          *
+         * @method number
+         * @memberOf dice.svg
          * @returns {object} An object with properties i (raw value) and o (string).
          */
         number: function() {
@@ -485,8 +545,10 @@
         },
 
         /**
-         * Returns a random SVG <length>.
+         * Returns a random SVG length.
          *
+         * @method length
+         * @memberOf dice.svg
          * @returns {object} An object with properties i (raw value) and o (string).
          */
         length: function() {
@@ -500,8 +562,10 @@
         },
 
         /**
-         * Returns a random SVG <coordinate> string.
+         * Returns a random SVG coordinate.
          *
+         * @method coordinate
+         * @memberOf dice.svg
          * @returns {string} Random coordinate.
          */
         coordinate: function() {
@@ -509,8 +573,10 @@
         },
 
         /**
-         * Returns a random SVG <color> string.
+         * Returns a random SVG color.
          *
+         * @method color
+         * @memberOf dice.svg
          * @returns {string} Random color.
          */
         color: function() {
@@ -518,8 +584,10 @@
         },
 
         /**
-         * Returns a random SVG <opacity-value> string.
+         * Returns a random SVG opacity-value.
          *
+         * @method opacityValue
+         * @memberOf dice.svg
          * @returns {string} Random opacity-value.
          */
         opacityValue: function() {
@@ -527,8 +595,10 @@
         },
 
         /**
-         * Returns a random SVG <transform-list> string.
+         * Returns a random SVG transform-list.
          *
+         * @method transformList
+         * @memberOf dice.svg
          * @returns {string} Random transform-list.
          */
         transformList: function() {
@@ -569,8 +639,10 @@
         },
 
         /**
-         * Returns a random <point> string.
+         * Returns a random point.
          *
+         * @method point
+         * @memberOf dice.svg
          * @returns {string} Random point.
          */
         point: function() {
@@ -578,8 +650,10 @@
         },
 
         /**
-         * Returns a random <path> string.
+         * Returns a random path.
          *
+         * @method path
+         * @memberOf dice.svg
          * @returns {string} Random path.
          */
         path: function() {
