@@ -184,7 +184,6 @@
     var dist = {
         /**
          * Generates some uniformly distributed random values.
-         * https://en.wikipedia.org/wiki/Uniform_distribution_(continuous)
          *
          * @method uniform
          * @memberOf dice.dist
@@ -201,7 +200,6 @@
 
         /**
          * Returns some exponentially distributed random values.
-         * https://en.wikipedia.org/wiki/Exponential_distribution
          *
          * @method exponential
          * @memberOf dice.dist
@@ -217,7 +215,6 @@
 
         /**
          * Returns some Pareto distributed random values.
-         * https://en.wikipedia.org/wiki/Pareto_distribution
          *
          * @method pareto
          * @memberOf dice.dist
@@ -234,7 +231,6 @@
 
         /**
          * Returns some bounded Pareto distributed random values.
-         * https://en.wikipedia.org/wiki/Pareto_distribution#Bounded_Pareto_distribution
          *
          * @method boundedPareto
          * @memberOf dice.dist
@@ -254,7 +250,6 @@
 
         /**
          * Returns some normally distributed random values.
-         * https://en.wikipedia.org/wiki/Normal_distribution
          *
          * @method normal
          * @memberOf dice.dist
@@ -273,7 +268,6 @@
 
         /**
          * Returns some log-normally distributed random values.
-         * https://en.wikipedia.org/wiki/Log-normal_distribution
          *
          * @method lognormal
          * @memberOf dice.dist
@@ -292,7 +286,6 @@
 
         /**
          * Returns some Weibull distributed random values.
-         * https://en.wikipedia.org/wiki/Weibull_distribution
          *
          * @method weibull
          * @memberOf dice.dist
@@ -309,7 +302,6 @@
 
         /**
          * Returns some Poisson distributed random values.
-         * https://en.wikipedia.org/wiki/Poisson_distribution
          *
          * @method poisson
          * @memberOf dice.dist

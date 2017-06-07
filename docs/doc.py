@@ -273,7 +273,7 @@ class Documentation:
         for obj in self._doc:
             content += title(obj)
             if obj['type'] == 'method':
-                content += "<div class='card'>" + func(obj)
+                content += "<div class='card'>" + func(obj) + "<br>"
             if obj['type'] in ['namespace', 'method']:
                 content += desc(obj)
             if 'param' in obj:
@@ -282,7 +282,6 @@ class Documentation:
                 content += returns(obj)
             if obj['type'] == 'method':
                 content += "</div>"
-        content = re.sub(r'(https://.+)', r'<a href="\1">\1</a>', content)
 
         # add to template
         with open(filename, 'w') as f:
