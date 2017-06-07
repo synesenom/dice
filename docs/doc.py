@@ -230,22 +230,18 @@ class Documentation:
         def args(o):
             html = "<table>"
             html += "<thead><tr>" \
-                    "<th class='fifth'>argument</th>" \
-                    "<th class='fifth'>type</th>" \
-                    "<th class='fifth'>optional</th>" \
+                    "<th>argument</th>" \
                     "<th>description</th>" \
                     "</tr></thead>"
             for p in o['param']:
-                html += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>"\
-                        % (p['name'], ", ".join("<code>%s</code>" % x for x in p['type']),
-                           "yes" if p['optional'] else "no", p['desc'])
+                html += "<tr><td>%s</td><td>%s</td></tr>" % (p['name'], p['desc'])
             html += "</table>"
             return html
 
         def returns(o):
             html = "<table>"
             html += "<thead><tr>" \
-                    "<th class='third'>returns</th>" \
+                    "<th class='fifth'>returns</th>" \
                     "<th>description</th>" \
                     "</tr></thead>"
             html += "<tr><td>%s</td><td>%s</td></tr>" \
