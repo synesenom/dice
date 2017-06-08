@@ -230,7 +230,7 @@ class Documentation:
         def args(o):
             html = "<table>"
             html += "<thead><tr>" \
-                    "<th>argument</th>" \
+                    "<th class='fifth'>argument</th>" \
                     "<th>description</th>" \
                     "</tr></thead>"
             for p in o['param']:
@@ -273,7 +273,7 @@ class Documentation:
         for obj in self._doc:
             content += title(obj)
             if obj['type'] == 'method':
-                content += "<div class='card'>" + func(obj) + "<br>n "
+                content += "<div class='card'>" + func(obj) + "<br>"
             if obj['type'] in ['namespace', 'method']:
                 content += desc(obj)
             if 'param' in obj:

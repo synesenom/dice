@@ -73,17 +73,17 @@
          * @memberOf dice.core
          * @param {number=} min Lower boundary, or upper if max is not given.
          * @param {number=} max Upper boundary.
-         * @param {number=} k Number of floats to generate.
+         * @param {number=} n Number of floats to generate.
          * @returns {(number|Array)} Single float or array of random floats.
          */
-        float: function (min, max, k) {
+        float: function (min, max, n) {
             if (arguments.length == 0)
                 return r(0, 1);
             if (arguments.length == 1)
                 return r(0, min);
             return some(function() {
                 return r(min, max);
-            }, k);
+            }, n);
         },
 
         /**
@@ -95,15 +95,15 @@
          * @memberOf dice.core
          * @param {number} min Lower boundary, or upper if max is not specified.
          * @param {number=} max Upper boundary.
-         * @param {number=} k Number of integers to generate.
+         * @param {number=} n Number of integers to generate.
          * @returns {(number|Array)} Single integer or array of random integers.
          */
-        int: function (min, max, k) {
+        int: function (min, max, n) {
             if (arguments.length == 1)
                 return Math.floor(r(0, min+1));
             return some(function () {
                 return Math.floor(r(min, max+1));
-            }, k);
+            }, n);
         },
 
         /**
@@ -112,16 +112,16 @@
          * @method choice
          * @memberOf dice.core
          * @param {Array} values Array to sample from.
-         * @param {number=} k Number of elements to sample.
+         * @param {number=} n Number of elements to sample.
          * @returns {(object|Array)} Single element or array of sampled elements. If array is invalid, null pointer is
          * returned.
          */
-        choice: function (values, k) {
+        choice: function (values, n) {
             if (values === null || values === undefined || values.length == 0)
                 return null;
             return some(function () {
                 return values[Math.floor(r(0, values.length))];
-            }, k);
+            }, n);
         },
 
         /**
@@ -130,15 +130,15 @@
          * @method char
          * @memberOf dice.core
          * @param {string} string String to sample characters from.
-         * @param {number=} k Number of characters to sample.
+         * @param {number=} n Number of characters to sample.
          * @returns {(string|Array)} Random character if k is not given or less than 2, an array of random characters otherwise.
          */
-        char: function (string, k) {
+        char: function (string, n) {
             if (string === null || string === undefined || string.length == 0)
                 return "";
             return some(function () {
                 return string.charAt(Math.floor(r(0, string.length)));
-            }, k);
+            }, n);
         },
 
         /**
@@ -166,13 +166,13 @@
          * @param {number} p Bias (probability of head).
          * @param {object} head Head value.
          * @param {object} tail Tail value.
-         * @param {number=} k Number of coins to flip.
+         * @param {number=} n Number of coins to flip.
          * @returns {(object|Array)} Object of head/tail value or an array of head/tail values.
          */
-        coin: function(p, head, tail, k) {
+        coin: function(p, head, tail, n) {
             return some(function() {
                 return Math.random() < p ? head : tail;
-            }, k);
+            }, n);
         }
     };
 
@@ -200,7 +200,7 @@
         },
 
         /**
-         * Returns some exponentially distributed random values.
+         * Generates some exponentially distributed random values.
          *
          * @method exponential
          * @memberOf dice.dist
@@ -215,7 +215,7 @@
         },
 
         /**
-         * Returns some Pareto distributed random values.
+         * Generates some Pareto distributed random values.
          *
          * @method pareto
          * @memberOf dice.dist
@@ -231,7 +231,7 @@
         },
 
         /**
-         * Returns some bounded Pareto distributed random values.
+         * Generates some bounded Pareto distributed random values.
          *
          * @method boundedPareto
          * @memberOf dice.dist
@@ -250,12 +250,12 @@
         },
 
         /**
-         * Returns some normally distributed random values.
+         * Generates some normally distributed random values.
          *
          * @method normal
          * @memberOf dice.dist
-         * @param {number} mu Mean (location).
-         * @param {number} sigma Variance (squared scale).
+         * @param {number} mu Location parameter (mean).
+         * @param {number} sigma Squared scale parameter (variance).
          * @param {number=} n Number of values to return.
          * @returns {(number|Array)} Single value or array of random values.
          */
@@ -268,7 +268,7 @@
         },
 
         /**
-         * Returns some log-normally distributed random values.
+         * Generates some log-normally distributed random values.
          *
          * @method lognormal
          * @memberOf dice.dist
@@ -286,7 +286,7 @@
         },
 
         /**
-         * Returns some Weibull distributed random values.
+         * Generates some Weibull distributed random values.
          *
          * @method weibull
          * @memberOf dice.dist
@@ -302,7 +302,7 @@
         },
 
         /**
-         * Returns some Poisson distributed random values.
+         * Generates some Poisson distributed random values.
          * FIXME use different methods for small/large lambda
          *
          * @method poisson
@@ -503,7 +503,6 @@
 
     /**
      * Generators of SVG related entities.
-     * https://developer.mozilla.org/en-US/docs/Web/SVG/Content_type
      *
      * @namespace svg
      * @memberOf dice
