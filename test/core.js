@@ -136,7 +136,7 @@ describe('dice', function() {
                     }
 
                     // Distribution is uniform
-                    return utils.chi_test(values, function(x) {
+                    return utils.chi_test(values, function() {
                         return 1 / Math.abs(max-min+1);
                     }, 1);
                 });
@@ -159,7 +159,7 @@ describe('dice', function() {
                     }
 
                     // Distribution is uniform
-                    return utils.chi_test(values, function(x) {
+                    return utils.chi_test(values, function() {
                         return 1 / Math.abs(max-min+1);
                     }, 1);
                 });
@@ -181,7 +181,7 @@ describe('dice', function() {
                     }
 
                     // Distribution is uniform
-                    return utils.chi_test(values, function(x) {
+                    return utils.chi_test(values, function() {
                         return 1 / Math.abs(max+1);
                     }, 1);
                 });
@@ -208,7 +208,9 @@ describe('dice', function() {
                     }
                     for (var i in values) {
                         // Distribution is uniform
-                        assert.equal(true, freqs[values[i]] > 0);
+                        if (values.hasOwnProperty(i)) {
+                            assert.equal(true, freqs[values[i]] > 0);
+                        }
                     }
                     for (i in freqs) {
                         assert.equal(values.indexOf(i) > -1, true)
@@ -257,7 +259,9 @@ describe('dice', function() {
                     // Check if all positions have been visited at least once
                     pos.forEach(function(p) {
                         for (i in p)
-                            assert.equal(true, p[i] > 0);
+                            if (p.hasOwnProperty(i)) {
+                                assert.equal(true, p[i] > 0);
+                            }
                     });
                 }
             });
@@ -267,15 +271,25 @@ describe('dice', function() {
             it('should return head with some probability', function() {
                 utils.trials(function() {
                     var p = Math.random();
+                    var k = Math.floor(Math.random() * 200 - 100);
+                    var head = Math.random();
+                    var tail = Math.random();
                     var values = [];
                     for (var lap=0; lap<LAPS; lap++) {
-                        var r = core.coin(p, 0, 1);
-                        values.push(r);
+                        var r = core.coin(p, head, tail, k);
+                        if (k < 2)
+                            r = [r];
+                        r.forEach(function (ri) {
+                            values.push(ri);
+                        });
                     }
+
+                    // Length is correct
+                    assert.equal(k < 2 ? 1 : k, r.length);
 
                     // Distribution is uniform
                     return utils.chi_test(values, function(x) {
-                        return x == 0 ? p : 1-p;
+                        return x == head ? p : 1-p;
                     }, 0);
                 });
             });

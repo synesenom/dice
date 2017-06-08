@@ -273,7 +273,7 @@ class Documentation:
         for obj in self._doc:
             content += title(obj)
             if obj['type'] == 'method':
-                content += "<div class='card'>" + func(obj) + "<br>"
+                content += "<div class='card'>" + func(obj) + "<br>n "
             if obj['type'] in ['namespace', 'method']:
                 content += desc(obj)
             if 'param' in obj:
