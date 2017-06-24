@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="dice.min.js"></script>
+    <title>TEST PAGE</title>
+</head>
+<body>
+<script>
+    ran = new dice.dist.Alias([31, 67, 12]);
+    console.log(ran.sample(100));
+    ran.reset([1, 2, 1, 1, 1]);
+    console.log(ran.sample(100));
+</script>
+</body>
+</html>

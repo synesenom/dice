@@ -33,7 +33,7 @@
             <input type="checkbox" id="s1-api">
             <label for="s1-api">api</label>
             <div class="s1">
-                <input type='checkbox' id='s2-dice-core'><label for='s2-dice-core'>core</label><div class='s2'><a href='#api-dice-core-float'>float</a><a href='#api-dice-core-int'>int</a><a href='#api-dice-core-choice'>choice</a><a href='#api-dice-core-char'>char</a><a href='#api-dice-core-shuffle'>shuffle</a><a href='#api-dice-core-coin'>coin</a></div><input type='checkbox' id='s2-dice-dist'><label for='s2-dice-dist'>dist</label><div class='s2'><a href='#api-dice-dist-uniform'>uniform</a><a href='#api-dice-dist-exponential'>exponential</a><a href='#api-dice-dist-pareto'>pareto</a><a href='#api-dice-dist-boundedPareto'>boundedPareto</a><a href='#api-dice-dist-normal'>normal</a><a href='#api-dice-dist-lognormal'>lognormal</a><a href='#api-dice-dist-weibull'>weibull</a><a href='#api-dice-dist-poisson'>poisson</a></div><input type='checkbox' id='s2-dice-css'><label for='s2-dice-css'>css</label><div class='s2'><a href='#api-dice-css-integer'>integer</a><a href='#api-dice-css-number'>number</a><a href='#api-dice-css-length'>length</a><a href='#api-dice-css-opacityValue'>opacityValue</a><a href='#api-dice-css-color'>color</a></div><input type='checkbox' id='s2-dice-svg'><label for='s2-dice-svg'>svg</label><div class='s2'><a href='#api-dice-svg-integer'>integer</a><a href='#api-dice-svg-number'>number</a><a href='#api-dice-svg-length'>length</a><a href='#api-dice-svg-coordinate'>coordinate</a><a href='#api-dice-svg-color'>color</a><a href='#api-dice-svg-opacityValue'>opacityValue</a><a href='#api-dice-svg-transformList'>transformList</a><a href='#api-dice-svg-point'>point</a><a href='#api-dice-svg-path'>path</a></div>
+                <input type='checkbox' id='s2-dice-core'><label for='s2-dice-core'>core</label><div class='s2'><a href='#api-dice-core-float'>float</a><a href='#api-dice-core-int'>int</a><a href='#api-dice-core-choice'>choice</a><a href='#api-dice-core-char'>char</a><a href='#api-dice-core-shuffle'>shuffle</a><a href='#api-dice-core-coin'>coin</a></div><input type='checkbox' id='s2-dice-dist'><label for='s2-dice-dist'>dist</label><div class='s2'><a href='#api-dice-dist-uniform'>uniform</a><a href='#api-dice-dist-exponential'>exponential</a><a href='#api-dice-dist-pareto'>pareto</a><a href='#api-dice-dist-boundedPareto'>boundedPareto</a><a href='#api-dice-dist-normal'>normal</a><a href='#api-dice-dist-lognormal'>lognormal</a><a href='#api-dice-dist-weibull'>weibull</a><a href='#api-dice-dist-poisson'>poisson</a></div><input type='checkbox' id='s2-dice-css'><label for='s2-dice-css'>css</label><div class='s2'><a href='#api-dice-css-CSSContent'>CSSContent</a><a href='#api-dice-css-integer'>integer</a><a href='#api-dice-css-number'>number</a><a href='#api-dice-css-length'>length</a><a href='#api-dice-css-opacityValue'>opacityValue</a><a href='#api-dice-css-color'>color</a></div><input type='checkbox' id='s2-dice-svg'><label for='s2-dice-svg'>svg</label><div class='s2'><a href='#api-dice-svg-SVGContent'>SVGContent</a><a href='#api-dice-svg-integer'>integer</a><a href='#api-dice-svg-number'>number</a><a href='#api-dice-svg-length'>length</a><a href='#api-dice-svg-coordinate'>coordinate</a><a href='#api-dice-svg-color'>color</a><a href='#api-dice-svg-opacityValue'>opacityValue</a><a href='#api-dice-svg-transformList'>transformList</a><a href='#api-dice-svg-point'>point</a><a href='#api-dice-svg-path'>path</a></div>
             </div>
         </div>
     </nav>
@@ -55,94 +55,100 @@ Core functionality, implements basic uniform generators and array manipulators.
 <h3 id='api-dice-core-float'>float</h3>
 <div class='card'><pre>dice.core.float([min[, max[, n]]])</pre>
 <br>Generates some uniformly distributed random floats in (min, max). If min > max, a random float in (max, min) is generated. If no parameters are passed, generates a single random float between 0 and 1. If only min is specified, generates a single random float between 0 and min.
-<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td>min</td><td>Lower boundary, or upper if max is not given.</td></tr><tr><td>max</td><td>Upper boundary.</td></tr><tr><td>n</td><td>Number of floats to generate.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single float or array of random floats.</td></tr></table></div><h3 id='api-dice-core-int'>int</h3>
+<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td><i>min</i></td><td>Lower boundary, or upper if max is not given.</td></tr><tr><td><i>max</i></td><td>Upper boundary.</td></tr><tr><td><i>n</i></td><td>Number of floats to generate.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single float or array of random floats.</td></tr></table></div><h3 id='api-dice-core-int'>int</h3>
 <div class='card'><pre>dice.core.int(min[, max[, n]])</pre>
 <br>Generates some uniformly distributed random integers in (min, max). If min > max, a random integer in (max, min) is generated. If only min is specified, generates a single random integer between 0 and min.
-<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td>min</td><td>Lower boundary, or upper if max is not specified.</td></tr><tr><td>max</td><td>Upper boundary.</td></tr><tr><td>n</td><td>Number of integers to generate.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single integer or array of random integers.</td></tr></table></div><h3 id='api-dice-core-choice'>choice</h3>
+<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td><i>min</i></td><td>Lower boundary, or upper if max is not specified.</td></tr><tr><td><i>max</i></td><td>Upper boundary.</td></tr><tr><td><i>n</i></td><td>Number of integers to generate.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single integer or array of random integers.</td></tr></table></div><h3 id='api-dice-core-choice'>choice</h3>
 <div class='card'><pre>dice.core.choice(values[, n])</pre>
 <br>Samples some elements with replacement from an array with uniform distribution.
-<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td>values</td><td>Array to sample from.</td></tr><tr><td>n</td><td>Number of elements to sample.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>object</code>, <code>Array</code></td><td>Single element or array of sampled elements. If array is invalid, null pointer is returned.</td></tr></table></div><h3 id='api-dice-core-char'>char</h3>
+<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td><i>values</i></td><td>Array to sample from.</td></tr><tr><td><i>n</i></td><td>Number of elements to sample.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>object</code>, <code>Array</code></td><td>Single element or array of sampled elements. If array is invalid, null pointer is returned.</td></tr></table></div><h3 id='api-dice-core-char'>char</h3>
 <div class='card'><pre>dice.core.char(string[, n])</pre>
 <br>Samples some characters with replacement from a string with uniform distribution.
-<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td>string</td><td>String to sample characters from.</td></tr><tr><td>n</td><td>Number of characters to sample.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>string</code>, <code>Array</code></td><td>Random character if k is not given or less than 2, an array of random characters otherwise.</td></tr></table></div><h3 id='api-dice-core-shuffle'>shuffle</h3>
+<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td><i>string</i></td><td>String to sample characters from.</td></tr><tr><td><i>n</i></td><td>Number of characters to sample.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>string</code>, <code>Array</code></td><td>Random character if k is not given or less than 2, an array of random characters otherwise.</td></tr></table></div><h3 id='api-dice-core-shuffle'>shuffle</h3>
 <div class='card'><pre>dice.core.shuffle(values)</pre>
 <br>Shuffles an array in-place using the Fisher--Yates algorithm.
-<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td>values</td><td>Array to shuffle.</td></tr></table></div><h3 id='api-dice-core-coin'>coin</h3>
+<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td><i>values</i></td><td>Array to shuffle.</td></tr></table></div><h3 id='api-dice-core-coin'>coin</h3>
 <div class='card'><pre>dice.core.coin(p, head, tail[, n])</pre>
 <br>Flips a biased coin several times and returns the associated head/tail value or array of values.
-<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td>p</td><td>Bias (probability of head).</td></tr><tr><td>head</td><td>Head value.</td></tr><tr><td>tail</td><td>Tail value.</td></tr><tr><td>n</td><td>Number of coins to flip.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>object</code>, <code>Array</code></td><td>Object of head/tail value or an array of head/tail values.</td></tr></table></div><h2 id='api-dice-dist'>dist</h2>
+<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td><i>p</i></td><td>Bias (probability of head).</td></tr><tr><td><i>head</i></td><td>Head value.</td></tr><tr><td><i>tail</i></td><td>Tail value.</td></tr><tr><td><i>n</i></td><td>Number of coins to flip.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>object</code>, <code>Array</code></td><td>Object of head/tail value or an array of head/tail values.</td></tr></table></div><h2 id='api-dice-dist'>dist</h2>
 A collection of generators for well-known distributions.
 <h3 id='api-dice-dist-uniform'>uniform</h3>
 <div class='card'><pre>dice.dist.uniform(min, max[, n])</pre>
 <br>Generates some uniformly distributed random values.
-<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td>min</td><td>Lower boundary.</td></tr><tr><td>max</td><td>Upper boundary.</td></tr><tr><td>n</td><td>Number of values to return.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single value or array of random values.</td></tr></table></div><h3 id='api-dice-dist-exponential'>exponential</h3>
+<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td><i>min</i></td><td>Lower boundary.</td></tr><tr><td><i>max</i></td><td>Upper boundary.</td></tr><tr><td><i>n</i></td><td>Number of values to return.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single value or array of random values.</td></tr></table></div><h3 id='api-dice-dist-exponential'>exponential</h3>
 <div class='card'><pre>dice.dist.exponential(lambda[, n])</pre>
 <br>Generates some exponentially distributed random values.
-<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td>lambda</td><td>Rate parameter.</td></tr><tr><td>n</td><td>Number of values to return.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single value or array of random values.</td></tr></table></div><h3 id='api-dice-dist-pareto'>pareto</h3>
+<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td><i>lambda</i></td><td>Rate parameter.</td></tr><tr><td><i>n</i></td><td>Number of values to return.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single value or array of random values.</td></tr></table></div><h3 id='api-dice-dist-pareto'>pareto</h3>
 <div class='card'><pre>dice.dist.pareto(xmin, alpha[, n])</pre>
 <br>Generates some Pareto distributed random values.
-<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td>xmin</td><td>Scale parameter.</td></tr><tr><td>alpha</td><td>Shape parameter.</td></tr><tr><td>n</td><td>Number of values to return.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single value or array of random values.</td></tr></table></div><h3 id='api-dice-dist-boundedPareto'>boundedPareto</h3>
+<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td><i>xmin</i></td><td>Scale parameter.</td></tr><tr><td><i>alpha</i></td><td>Shape parameter.</td></tr><tr><td><i>n</i></td><td>Number of values to return.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single value or array of random values.</td></tr></table></div><h3 id='api-dice-dist-boundedPareto'>boundedPareto</h3>
 <div class='card'><pre>dice.dist.boundedPareto(xmin, xmax, alpha[, n])</pre>
 <br>Generates some bounded Pareto distributed random values.
-<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td>xmin</td><td>Lower boundary.</td></tr><tr><td>xmax</td><td>Upper boundary.</td></tr><tr><td>alpha</td><td>Shape parameter.</td></tr><tr><td>n</td><td>Number of values to return.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single value or array of random values.</td></tr></table></div><h3 id='api-dice-dist-normal'>normal</h3>
+<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td><i>xmin</i></td><td>Lower boundary.</td></tr><tr><td><i>xmax</i></td><td>Upper boundary.</td></tr><tr><td><i>alpha</i></td><td>Shape parameter.</td></tr><tr><td><i>n</i></td><td>Number of values to return.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single value or array of random values.</td></tr></table></div><h3 id='api-dice-dist-normal'>normal</h3>
 <div class='card'><pre>dice.dist.normal(mu, sigma[, n])</pre>
 <br>Generates some normally distributed random values.
-<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td>mu</td><td>Location parameter (mean).</td></tr><tr><td>sigma</td><td>Squared scale parameter (variance).</td></tr><tr><td>n</td><td>Number of values to return.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single value or array of random values.</td></tr></table></div><h3 id='api-dice-dist-lognormal'>lognormal</h3>
+<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td><i>mu</i></td><td>Location parameter (mean).</td></tr><tr><td><i>sigma</i></td><td>Squared scale parameter (variance).</td></tr><tr><td><i>n</i></td><td>Number of values to return.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single value or array of random values.</td></tr></table></div><h3 id='api-dice-dist-lognormal'>lognormal</h3>
 <div class='card'><pre>dice.dist.lognormal(mu, sigma[, n])</pre>
 <br>Generates some log-normally distributed random values.
-<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td>mu</td><td>Location parameter.</td></tr><tr><td>sigma</td><td>Scale parameter.</td></tr><tr><td>n</td><td>Number of values to return.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single value or array of random values.</td></tr></table></div><h3 id='api-dice-dist-weibull'>weibull</h3>
+<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td><i>mu</i></td><td>Location parameter.</td></tr><tr><td><i>sigma</i></td><td>Scale parameter.</td></tr><tr><td><i>n</i></td><td>Number of values to return.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single value or array of random values.</td></tr></table></div><h3 id='api-dice-dist-weibull'>weibull</h3>
 <div class='card'><pre>dice.dist.weibull(lambda, k[, n])</pre>
 <br>Generates some Weibull distributed random values.
-<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td>lambda</td><td>Scale parameter.</td></tr><tr><td>k</td><td>Shape parameter.</td></tr><tr><td>n</td><td>Number of values to return.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single value or array of random values.</td></tr></table></div><h3 id='api-dice-dist-poisson'>poisson</h3>
+<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td><i>lambda</i></td><td>Scale parameter.</td></tr><tr><td><i>k</i></td><td>Shape parameter.</td></tr><tr><td><i>n</i></td><td>Number of values to return.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single value or array of random values.</td></tr></table></div><h3 id='api-dice-dist-poisson'>poisson</h3>
 <div class='card'><pre>dice.dist.poisson(lambda[, n])</pre>
 <br>Generates some Poisson distributed random values. FIXME use different methods for small/large lambda
-<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td>lambda</td><td>Mean of the distribution.</td></tr><tr><td>n</td><td>Number of values to return.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single value or array of random values.</td></tr></table></div><h2 id='api-dice-css'>css</h2>
-Generators of CSS related entities.
-<h3 id='api-dice-css-integer'>integer</h3>
+<table><thead><tr><th class='fifth'>argument</th><th>description</th></tr></thead><tr><td><i>lambda</i></td><td>Mean of the distribution.</td></tr><tr><td><i>n</i></td><td>Number of values to return.</td></tr></table><table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>number</code>, <code>Array</code></td><td>Single value or array of random values.</td></tr></table></div><h2 id='api-dice-css'>css</h2>
+A collection of methods to generate CSS content types.
+<h3 id='api-dice-css-CSSContent'>CSSContent</h3>
+<div class='card'><pre>dice.css.CSSContent</pre>
+<br>Class describing a random CSS content.
+<table><thead><tr><th class='fifth'>property</th><th>description</th></tr></thead><tr><td><i>i</i></td><td>Object corresponding to the CSS content. Can be a single string, an array, etc.</td></tr><tr><td><i>o</i></td><td>String representation of the CSS content. This is the final value that is put after the colon in a property:value pair.</td></tr></table></div><h3 id='api-dice-css-integer'>integer</h3>
 <div class='card'><pre>dice.css.integer()</pre>
-<br>Returns a random CSS integer.
-<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>object</code></td><td>An object with properties i (raw value) and o (string).</td></tr></table></div><h3 id='api-dice-css-number'>number</h3>
+<br>Generates a random CSS integer.
+<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>CSSContent</code></td><td>Random CSS integer.</td></tr></table></div><h3 id='api-dice-css-number'>number</h3>
 <div class='card'><pre>dice.css.number()</pre>
-<br>Returns a random CSS number.
-<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>object</code></td><td>An object with properties i (raw value) and o (string).</td></tr></table></div><h3 id='api-dice-css-length'>length</h3>
+<br>Generates a random CSS number.
+<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>CSSContent</code></td><td>Random CSS number.</td></tr></table></div><h3 id='api-dice-css-length'>length</h3>
 <div class='card'><pre>dice.css.length()</pre>
-<br>Returns a random CSS length.
-<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>object</code></td><td>An object with properties i (raw value) and o (string).</td></tr></table></div><h3 id='api-dice-css-opacityValue'>opacityValue</h3>
+<br>Generates a random CSS length.
+<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>CSSContent</code></td><td>Random CSS length.</td></tr></table></div><h3 id='api-dice-css-opacityValue'>opacityValue</h3>
 <div class='card'><pre>dice.css.opacityValue()</pre>
-<br>Returns a random CSS opacity-value.
-<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>object</code></td><td>An object with properties i (raw value) and o (string).</td></tr></table></div><h3 id='api-dice-css-color'>color</h3>
+<br>Generates a random CSS opacity-value.
+<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>CSSContent</code></td><td>Random CSS opacityValue.</td></tr></table></div><h3 id='api-dice-css-color'>color</h3>
 <div class='card'><pre>dice.css.color()</pre>
-<br>Returns a random CSS color.
-<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>object</code></td><td>An object with properties i (raw value) and o (string).</td></tr></table></div><h2 id='api-dice-svg'>svg</h2>
-Generators of SVG related entities.
-<h3 id='api-dice-svg-integer'>integer</h3>
+<br>Generates a random CSS color.
+<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>CSSContent</code></td><td>Random CSS color.</td></tr></table></div><h2 id='api-dice-svg'>svg</h2>
+Collection of generators for SVG content.
+<h3 id='api-dice-svg-SVGContent'>SVGContent</h3>
+<div class='card'><pre>dice.svg.SVGContent</pre>
+<br>Class describing a random SVG content. This is an alias for CSSContent.
+<table><thead><tr><th class='fifth'>property</th><th>description</th></tr></thead><tr><td><i>i</i></td><td>Object corresponding to the SVG content. Can be a single string, an array, etc.</td></tr><tr><td><i>o</i></td><td>String representation of the SVG content. This is the final value that is put after the colon in a property:value pair.</td></tr></table></div><h3 id='api-dice-svg-integer'>integer</h3>
 <div class='card'><pre>dice.svg.integer()</pre>
-<br>Returns a random SVG integer.
-<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>object</code></td><td>An object with properties i (raw value) and o (string).</td></tr></table></div><h3 id='api-dice-svg-number'>number</h3>
+<br>Generates a random SVG integer.
+<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>SVGContent</code></td><td>Random SVG integer.</td></tr></table></div><h3 id='api-dice-svg-number'>number</h3>
 <div class='card'><pre>dice.svg.number()</pre>
-<br>Returns a random SVG number.
-<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>object</code></td><td>An object with properties i (raw value) and o (string).</td></tr></table></div><h3 id='api-dice-svg-length'>length</h3>
+<br>Generates a random SVG number.
+<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>SVGContent</code></td><td>Random SVG number.</td></tr></table></div><h3 id='api-dice-svg-length'>length</h3>
 <div class='card'><pre>dice.svg.length()</pre>
-<br>Returns a random SVG length.
-<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>object</code></td><td>An object with properties i (raw value) and o (string).</td></tr></table></div><h3 id='api-dice-svg-coordinate'>coordinate</h3>
+<br>Generates a random SVG length.
+<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>SVGContent</code></td><td>Random SVG length.</td></tr></table></div><h3 id='api-dice-svg-coordinate'>coordinate</h3>
 <div class='card'><pre>dice.svg.coordinate()</pre>
-<br>Returns a random SVG coordinate.
-<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>string</code></td><td>Random coordinate.</td></tr></table></div><h3 id='api-dice-svg-color'>color</h3>
+<br>Generates a random SVG coordinate.
+<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>SVGContent</code></td><td>Random SVG coordinate.</td></tr></table></div><h3 id='api-dice-svg-color'>color</h3>
 <div class='card'><pre>dice.svg.color()</pre>
-<br>Returns a random SVG color.
-<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>string</code></td><td>Random color.</td></tr></table></div><h3 id='api-dice-svg-opacityValue'>opacityValue</h3>
+<br>Generates a random SVG color.
+<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>SVGContent</code></td><td>Random SVG color.</td></tr></table></div><h3 id='api-dice-svg-opacityValue'>opacityValue</h3>
 <div class='card'><pre>dice.svg.opacityValue()</pre>
-<br>Returns a random SVG opacity-value.
-<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>string</code></td><td>Random opacity-value.</td></tr></table></div><h3 id='api-dice-svg-transformList'>transformList</h3>
+<br>Generates a random SVG opacity-value.
+<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>SVGContent</code></td><td>Random SVG opacity-value.</td></tr></table></div><h3 id='api-dice-svg-transformList'>transformList</h3>
 <div class='card'><pre>dice.svg.transformList()</pre>
-<br>Returns a random SVG transform-list.
-<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>string</code></td><td>Random transform-list.</td></tr></table></div><h3 id='api-dice-svg-point'>point</h3>
+<br>Generates a random SVG transform-list.
+<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>SVGContent</code></td><td>Random SVG transform-list.</td></tr></table></div><h3 id='api-dice-svg-point'>point</h3>
 <div class='card'><pre>dice.svg.point()</pre>
-<br>Returns a random point.
-<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>string</code></td><td>Random point.</td></tr></table></div><h3 id='api-dice-svg-path'>path</h3>
+<br>Generates a random point.
+<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>SVGContent</code></td><td>Random SVG point.</td></tr></table></div><h3 id='api-dice-svg-path'>path</h3>
 <div class='card'><pre>dice.svg.path()</pre>
-<br>Returns a random path.
-<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>string</code></td><td>Random path.</td></tr></table></div>
+<br>Generates a random path.
+<table><thead><tr><th class='fifth'>returns</th><th>description</th></tr></thead><tr><td><code>SVGContent</code></td><td>Random SVG path.</td></tr></table></div>
     <label for="menu" id="exit"></label>
 </main>
 </body>

@@ -7,12 +7,15 @@ import json
 
 TAGS = {
     'param': 'param',
+    'property': 'property',
     'returns': 'returns',
     'memberOf': 'memberOf',
     'private': 'private',
     'namespace': 'namespace',
     'method': 'method',
-    'module': 'module'
+    'module': 'module',
+    'class': 'class',
+    'constructor': 'constructor'
 }
 
 
@@ -50,6 +53,16 @@ class DocBlock:
             }
 
     @staticmethod
+    def _get_property(text):
+        if DocBlock._has_tag(text, TAGS['property']):
+            # type
+            return {
+                'type': re.findall(r"@property \{(.*)\} .* .*", text)[0],
+                'name': re.findall("@property \{.*\} (.*?) .*", text)[0],
+                'desc': re.findall("@property \{.*\} .*? (.*)", text)[0] + " "
+            }
+
+    @staticmethod
     def _get_param(text):
         if DocBlock._has_tag(text, TAGS['param']):
             # type
@@ -64,7 +77,7 @@ class DocBlock:
             else:
                 p['optional'] = False
 
-            # parameter name
+            # name
             p['name'] = re.findall("@param \{.*\} (.*?) .*", text)[0]
 
             # description
@@ -115,6 +128,9 @@ class DocBlock:
                 if 'param' in self._content:
                     for i in range(len(self._content['param'])):
                         self._content['param'][i]['desc'] = DocBlock._clean(self._content['param'][i]['desc'])
+                if 'property' in self._content:
+                    for i in range(len(self._content['property'])):
+                        self._content['property'][i]['desc'] = DocBlock._clean(self._content['property'][i]['desc'])
 
                 # check for missing
                 if 'name' not in self._content:
@@ -131,17 +147,17 @@ class DocBlock:
             if self._status is not None:
                 line = line.strip("* ")
                 # flags
-                for flag in ['private']:
+                for flag in ['private', 'constructor']:
                     if DocBlock._get_flag(line, flag):
                         self._content[flag] = DocBlock._get_flag(line, flag)
                         self._status = flag
                         continue
 
                 # labels
-                for label in ['module', 'namespace', 'method', 'memberOf']:
+                for label in ['module', 'namespace', 'method', 'memberOf', 'class']:
                     if DocBlock._get_label(line, label):
                         self._content[label] = DocBlock._get_label(line, label)
-                        if label in ['module', 'namespace', 'method']:
+                        if label in ['module', 'namespace', 'method', 'class']:
                             self._content['name'] = self._content[label]
                             self._content['type'] = label
                         self._status = label
@@ -161,13 +177,23 @@ class DocBlock:
                     self._status = 'param'
                     continue
 
+                # property
+                if DocBlock._get_property(line):
+                    if 'property' not in self._content:
+                        self._content['property'] = []
+                    self._content['property'].append(DocBlock._get_property(line))
+                    self._status = 'property'
+                    continue
+
                 # normal line
                 if self._status == 'desc':
                     self._content['desc'] += line + " "
                 elif self._status == 'returns':
                     self._content['returns']['desc'] += line + " "
                 elif self._status == 'param':
-                    self._content['param'][-1] += line + " "
+                    self._content['param'][-1]['desc'] += line + " "
+                elif self._status == 'property':
+                    self._content['property'][-1]['desc'] += line + " "
 
 
 class Documentation:
@@ -194,21 +220,32 @@ class Documentation:
             json.dump(self._doc, f, indent=2)
 
     def html(self, filename, template):
-        def menu_entry(o):
-            if obj['type'] == 'namespace':
-                return "<input type='checkbox' id='s2-%s-%s'><label for='s2-%s-%s'>%s</label>\n"\
-                       % (o['memberOf'].replace('.', '-'), o['name'], o['memberOf'].replace('.', '-'), o['name'], o['name'])
-            return ""
-
         def title(o):
             if o['type'] == 'namespace':
                 return "<h2 id='api-%s-%s'>%s</h2>\n" % (o['memberOf'].replace('.', '-'), o['name'], o['name'])
-            if o['type'] == 'method':
+            if o['type'] in ['class', 'method']:
                 return "<h3 id='api-%s-%s'>%s</h3>\n" % (o['memberOf'].replace('.', '-'), o['name'], o['name'])
             return ""
 
         def desc(o):
             return o['desc'] + "\n"
+
+        def clas(o):
+            html = "<pre>" + o['memberOf'] + "." + o['name']
+            opts = 0
+            if 'param' in o:
+                if o['param'][0]['optional']:
+                    opts += 1
+                    html += "["
+                html += o['param'][0]['name']
+                for p in o['param'][1:]:
+                    if p['optional']:
+                        opts += 1
+                        html += "["
+                    html += ", " + p['name']
+            html += "".join(["]" for _ in range(opts)])
+            html += "</pre>\n"
+            return html
 
         def func(o):
             html = "<pre>" + o['memberOf'] + "." + o['name'] + "("
@@ -234,7 +271,18 @@ class Documentation:
                     "<th>description</th>" \
                     "</tr></thead>"
             for p in o['param']:
-                html += "<tr><td>%s</td><td>%s</td></tr>" % (p['name'], p['desc'])
+                html += "<tr><td><i>%s</i></td><td>%s</td></tr>" % (p['name'], p['desc'])
+            html += "</table>"
+            return html
+
+        def props(o):
+            html = "<table>"
+            html += "<thead><tr>" \
+                    "<th class='fifth'>property</th>" \
+                    "<th>description</th>" \
+                    "</tr></thead>"
+            for p in o['property']:
+                html += "<tr><td><i>%s</i></td><td>%s</td></tr>" % (p['name'], p['desc'])
             html += "</table>"
             return html
 
@@ -257,7 +305,7 @@ class Documentation:
                 tag = obj['name']
             if obj['type'] == 'namespace':
                 namespaces[tag + "." + obj['name']] = {'obj': obj, 'members': [], 'i': len(namespaces)}
-            if obj['type'] == 'method':
+            if obj['type'] in ['class', 'method']:
                 namespaces[obj['memberOf']]['members'].append(obj)
         for n in sorted([x for x in namespaces.values()], key=lambda x: x['i']):
             menu += "<input type='checkbox' id='s2-%s-%s'><label for='s2-%s-%s'>%s</label>"\
@@ -272,15 +320,19 @@ class Documentation:
         content = ""
         for obj in self._doc:
             content += title(obj)
-            if obj['type'] == 'method':
+            if obj['type'] in ['class']:
+                content += "<div class='card'>" + clas(obj) + "<br>"
+            if obj['type'] in ['method']:
                 content += "<div class='card'>" + func(obj) + "<br>"
-            if obj['type'] in ['namespace', 'method']:
+            if obj['type'] in ['namespace', 'method', 'class']:
                 content += desc(obj)
+            if 'property' in obj:
+                content += props(obj)
             if 'param' in obj:
                 content += args(obj)
             if 'returns' in obj:
                 content += returns(obj)
-            if obj['type'] == 'method':
+            if obj['type'] in ['class', 'method']:
                 content += "</div>"
 
         # add to template

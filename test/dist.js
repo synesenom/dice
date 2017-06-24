@@ -104,5 +104,27 @@ describe('dice', function() {
                 });
             });
         });
+
+        describe('custom', function () {
+            it('should return an array of customly distributed values', function () {
+                utils.trials(function() {
+                    const k = Math.random()*10 + 1;
+                    var weights = [];
+                    var sum = 0;
+                    for (var i=0; i<k; i++) {
+                        var w = Math.random() * 10;
+                        weights.push(w);
+                        sum += w;
+                    }
+                    var ran = new dist.Alias(weights);
+                    for (i=0; i<k; i++) {
+                        weights[i] /= sum;
+                    }
+                    return utils.chi_test(ran.sample(LAPS), function (x) {
+                        return weights[x];
+                    }, 1);
+                });
+            });
+        });
     });
 });

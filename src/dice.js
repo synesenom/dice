@@ -3,6 +3,8 @@
  * @module dice
  * FIXME add some more distributions: https://en.wikipedia.org/wiki/List_of_probability_distributions
  * FIXME add alias table
+ * TODO add jsdoc to CSS
+ * TODO add jsdoc to SVG
  * FIXME make SVG methods return object
  * FIXME go through documentation and finalize
  * TODO add processes: https://en.wikipedia.org/wiki/Stochastic_process
@@ -12,12 +14,12 @@
     if (typeof exports === "object" && typeof module !== "undefined") {
         // Common JS
         factory(exports);
-    } else if (typeof define === 'function' && define.amd) {
+    } else if (typeof define === 'function' && define['amd']) {
         // AMD
         define(['exports'], factory);
     } else {
         // Browser
-        factory((global.dice = global.dice || {}));
+        factory((global.dice = global['dice'] || {}));
     }
 } (this, (function (exports) { "use strict";
     /**
@@ -31,8 +33,8 @@
      * @returns {number} Random number.
      * @private
      */
-    function r(min, max) {
-        return min < max ? Math.random()*(max-min) + min : Math.random()*(min-max) + max;
+    function _r(min, max) {
+        return min < max ? Math.random() * (max - min) + min : Math.random() * (min - max) + max;
     }
 
     /**
@@ -45,24 +47,24 @@
      * @returns {(number|string|Array)} Single value or array of generated values.
      * @private
      */
-    function some(generator, k) {
+    function _some(generator, k) {
         if (k === null || k === undefined || k < 2)
             return generator();
         else {
             var values = new Array(k);
-            for (var i=0; i<k; i++)
+            for (var i = 0; i < k; i++)
                 values[i] = generator();
             return values;
         }
     }
 
     /**
-     * Core functionality, implements basic uniform generators and array manipulators.
+     * Core functionality: basic generators and manipulators.
      *
      * @namespace core
      * @memberOf dice
      */
-    var core = {
+    var core = (function() {
         /**
          * Generates some uniformly distributed random floats in (min, max).
          * If min > max, a random float in (max, min) is generated.
@@ -76,15 +78,15 @@
          * @param {number=} n Number of floats to generate.
          * @returns {(number|Array)} Single float or array of random floats.
          */
-        float: function (min, max, n) {
+        function float(min, max, n) {
             if (arguments.length == 0)
-                return r(0, 1);
+                return _r(0, 1);
             if (arguments.length == 1)
-                return r(0, min);
-            return some(function() {
-                return r(min, max);
+                return _r(0, min);
+            return _some(function () {
+                return _r(min, max);
             }, n);
-        },
+        }
 
         /**
          * Generates some uniformly distributed random integers in (min, max).
@@ -98,13 +100,13 @@
          * @param {number=} n Number of integers to generate.
          * @returns {(number|Array)} Single integer or array of random integers.
          */
-        int: function (min, max, n) {
+        function int(min, max, n) {
             if (arguments.length == 1)
-                return Math.floor(r(0, min+1));
-            return some(function () {
-                return Math.floor(r(min, max+1));
+                return Math.floor(_r(0, min + 1));
+            return _some(function () {
+                return Math.floor(_r(min, max + 1));
             }, n);
-        },
+        }
 
         /**
          * Samples some elements with replacement from an array with uniform distribution.
@@ -116,13 +118,13 @@
          * @returns {(object|Array)} Single element or array of sampled elements. If array is invalid, null pointer is
          * returned.
          */
-        choice: function (values, n) {
+        function choice(values, n) {
             if (values === null || values === undefined || values.length == 0)
                 return null;
-            return some(function () {
-                return values[Math.floor(r(0, values.length))];
+            return _some(function () {
+                return values[Math.floor(_r(0, values.length))];
             }, n);
-        },
+        }
 
         /**
          * Samples some characters with replacement from a string with uniform distribution.
@@ -133,13 +135,13 @@
          * @param {number=} n Number of characters to sample.
          * @returns {(string|Array)} Random character if k is not given or less than 2, an array of random characters otherwise.
          */
-        char: function (string, n) {
+        function char(string, n) {
             if (string === null || string === undefined || string.length == 0)
                 return "";
-            return some(function () {
-                return string.charAt(Math.floor(r(0, string.length)));
+            return _some(function () {
+                return string.charAt(Math.floor(_r(0, string.length)));
             }, n);
-        },
+        }
 
         /**
          * Shuffles an array in-place using the Fisher--Yates algorithm.
@@ -148,7 +150,7 @@
          * @memberOf dice.core
          * @param {Array} values Array to shuffle.
          */
-        shuffle: function (values) {
+        function shuffle(values) {
             var i, temp, l = values.length;
             while (l) {
                 i = Math.floor(Math.random() * l--);
@@ -156,7 +158,7 @@
                 values[l] = values[i];
                 values[i] = temp;
             }
-        },
+        }
 
         /**
          * Flips a biased coin several times and returns the associated head/tail value or array of values.
@@ -169,12 +171,21 @@
          * @param {number=} n Number of coins to flip.
          * @returns {(object|Array)} Object of head/tail value or an array of head/tail values.
          */
-        coin: function(p, head, tail, n) {
-            return some(function() {
+        function coin(p, head, tail, n) {
+            return _some(function () {
                 return Math.random() < p ? head : tail;
             }, n);
         }
-    };
+
+        return {
+            float: float,
+            int: int,
+            choice: choice,
+            char: char,
+            shuffle: shuffle,
+            coin: coin
+        };
+    })();
 
     /**
      * A collection of generators for well-known distributions.
@@ -182,7 +193,7 @@
      * @namespace dist
      * @memberOf dice
      */
-    var dist = {
+    var dist = (function(){
         /**
          * Generates some uniformly distributed random values.
          *
@@ -193,11 +204,11 @@
          * @param {number=} n Number of values to return.
          * @returns {(number|Array)} Single value or array of random values.
          */
-        uniform: function (min, max, n) {
-            return some(function() {
+        function uniform(min, max, n) {
+            return _some(function () {
                 return Math.random() * (max - min) + min;
             }, n);
-        },
+        }
 
         /**
          * Generates some exponentially distributed random values.
@@ -208,11 +219,47 @@
          * @param {number=} n Number of values to return.
          * @returns {number|Array} Single value or array of random values.
          */
-        exponential: function (lambda, n) {
-            return some(function () {
+        function exponential(lambda, n) {
+            return _some(function () {
                 return -Math.log(Math.random()) / lambda;
             }, n);
-        },
+        }
+
+        /**
+         * Generates some normally distributed random values.
+         *
+         * @method normal
+         * @memberOf dice.dist
+         * @param {number} mu Location parameter (mean).
+         * @param {number} sigma Squared scale parameter (variance).
+         * @param {number=} n Number of values to return.
+         * @returns {(number|Array)} Single value or array of random values.
+         */
+        function normal(mu, sigma, n) {
+            return _some(function () {
+                var u = Math.random(),
+                    v = Math.random();
+                return sigma * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v) + mu;
+            }, n);
+        }
+
+        /**
+         * Generates some log-normally distributed random values.
+         *
+         * @method lognormal
+         * @memberOf dice.dist
+         * @param {number} mu Location parameter.
+         * @param {number} sigma Scale parameter.
+         * @param {number=} n Number of values to return.
+         * @returns {(number|Array)} Single value or array of random values.
+         */
+        function lognormal(mu, sigma, n) {
+            return _some(function () {
+                var u = Math.random(),
+                    v = Math.random();
+                return Math.exp(sigma * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v) + mu);
+            }, n);
+        }
 
         /**
          * Generates some Pareto distributed random values.
@@ -224,11 +271,11 @@
          * @param {number=} n Number of values to return.
          * @returns {(number|Array)} Single value or array of random values.
          */
-        pareto: function (xmin, alpha, n) {
-            return some(function() {
+        function pareto(xmin, alpha, n) {
+            return _some(function () {
                 return xmin / Math.pow(Math.random(), 1 / alpha);
             }, n);
-        },
+        }
 
         /**
          * Generates some bounded Pareto distributed random values.
@@ -241,49 +288,13 @@
          * @param {number=} n Number of values to return.
          * @returns {(number|Array)} Single value or array of random values.
          */
-        boundedPareto: function (xmin, xmax, alpha, n) {
+        function boundedPareto(xmin, xmax, alpha, n) {
             var l = Math.pow(xmin, alpha);
             var h = Math.pow(xmax, alpha);
-            return some(function () {
+            return _some(function () {
                 return Math.pow((h + Math.random() * (l - h)) / (l * h), -1 / alpha);
             }, n);
-        },
-
-        /**
-         * Generates some normally distributed random values.
-         *
-         * @method normal
-         * @memberOf dice.dist
-         * @param {number} mu Location parameter (mean).
-         * @param {number} sigma Squared scale parameter (variance).
-         * @param {number=} n Number of values to return.
-         * @returns {(number|Array)} Single value or array of random values.
-         */
-        normal: function(mu, sigma, n) {
-            return some(function() {
-                var u = Math.random(),
-                    v = Math.random();
-                return sigma * Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v) + mu;
-            }, n);
-        },
-
-        /**
-         * Generates some log-normally distributed random values.
-         *
-         * @method lognormal
-         * @memberOf dice.dist
-         * @param {number} mu Location parameter.
-         * @param {number} sigma Scale parameter.
-         * @param {number=} n Number of values to return.
-         * @returns {(number|Array)} Single value or array of random values.
-         */
-        lognormal: function(mu, sigma, n) {
-            return some(function () {
-                var u = Math.random(),
-                    v = Math.random();
-                return Math.exp(sigma * Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v) + mu);
-            }, n);
-        },
+        }
 
         /**
          * Generates some Weibull distributed random values.
@@ -295,11 +306,11 @@
          * @param {number=} n Number of values to return.
          * @returns {(number|Array)} Single value or array of random values.
          */
-        weibull: function(lambda, k, n) {
-            return some(function() {
-                return lambda * Math.pow(-Math.log(Math.random()), 1/k);
+        function weibull(lambda, k, n) {
+            return _some(function () {
+                return lambda * Math.pow(-Math.log(Math.random()), 1 / k);
             }, n);
-        },
+        }
 
         /**
          * Generates some Poisson distributed random values.
@@ -311,8 +322,8 @@
          * @param {number=} n Number of values to return.
          * @returns {(number|Array)} Single value or array of random values.
          */
-        poisson: function(lambda, n) {
-            return some(function() {
+        function poisson(lambda, n) {
+            return _some(function () {
                 var l = Math.exp(-lambda),
                     k = 0,
                     p = 1;
@@ -320,93 +331,227 @@
                     k++;
                     p *= Math.random();
                 } while (p > l);
-                return k-1;
+                return k - 1;
             }, n);
         }
-    };
+
+        /**
+         * Class implementing the alias table method for custom distribution.
+         *
+         * @class Alias
+         * @memberOf dice.dist
+         * @param {Array} weights Array of weights to init the alias table with.
+         * @constructor
+         */
+        function Alias(weights) {
+            var _n = 0;
+            var _prob = [0];
+            var _alias = [0];
+
+            /**
+             * Resets alias table weights.
+             *
+             * @method reset
+             * @memberOf dice.dist.Alias
+             * @param {Array} w Array of weights to reset the alias table to.
+             */
+            this.reset = function(w) {
+                // Single element
+                if (w.length < 1) {
+                    _prob = [0];
+                    _alias = [0];
+                    return;
+                }
+                // Get sum (for normalization)
+                _n = w.length;
+                var sum = 0;
+                for (var i = 0; i < _n; i++)
+                    sum += w[i];
+
+                // Fill up small and large work lists
+                var p = [];
+                var small = [];
+                var large = [];
+                for (i = 0; i < _n; i++) {
+                    p.push(_n * w[i] / sum);
+                    if (p[i] < 1.0)
+                        small.push(i);
+                    else
+                        large.push(i);
+                }
+
+                // Init tables
+                _prob = [];
+                _alias = [];
+                for (i = 0; i < _n; i++) {
+                    _prob.push(1.0);
+                    _alias.push(i);
+                }
+
+                // Fill up alias table
+                var s = 0,
+                    l = 0;
+                while (small.length > 0 && large.length > 0) {
+                    s = small.shift();
+                    l = large.shift();
+
+                    _prob[s] = p[s];
+                    _alias[s] = l;
+
+                    p[l] += p[s] - 1.0;
+                    if (p[l] < 1.0)
+                        small.push(l);
+                    else
+                        large.push(l);
+                }
+                while (large.length > 0) {
+                    l = large.shift();
+                    _prob[l] = 1.0;
+                    _alias[l] = l;
+                }
+                while (small.length > 0) {
+                    s = small.shift();
+                    _prob[s] = 1.0;
+                    _alias[s] = s;
+                }
+            };
+            this.reset(weights);
+
+            /**
+             * Samples some values from the alias table.
+             *
+             * @method sample
+             * @memberOf dice.dist.Alias
+             * @param {number=} n Number of values to return.
+             * @returns {(number|Array)} Single value or array of random values.
+             */
+            this.sample = function(n) {
+                return _some(function () {
+                    if (_n <= 1) {
+                        return 0;
+                    }
+
+                    var i = Math.floor(Math.random() * _n);
+                    if (Math.random() < _prob[i])
+                        return i;
+                    else
+                        return _alias[i];
+                }, n);
+            };
+        }
+
+        return {
+            uniform: uniform,
+            exponential: exponential,
+            normal: normal,
+            lognormal: lognormal,
+            pareto: pareto,
+            boundedPareto: boundedPareto,
+            weibull: weibull,
+            poisson: poisson,
+            Alias: Alias
+        };
+    })();
 
     /**
-     * Generators of CSS related entities.
+     * A collection of methods to generate CSS content types.
      *
      * @namespace css
      * @memberOf dice
      */
-    var css = {
+    var css = (function() {
         /**
-         * Returns a random CSS integer.
+         * Class describing a random CSS content.
+         *
+         * @class CSSContent
+         * @memberOf dice.css
+         * @property {object} o Object corresponding to the CSS content. Can be a single string, an array, etc.
+         * @property {string} s String representation of the CSS content. This is the final value that is put after the
+         * colon in a property:value pair.
+         * @constructor
+         */
+        function CSSContent(o, s) {
+            return {o: o, s: s};
+        }
+
+        /**
+         * Generates a random CSS integer.
          *
          * @method integer
          * @memberOf dice.css
-         * @returns {object} An object with properties i (raw value) and o (string).
+         * @returns {CSSContent} Random CSS integer.
          */
-        integer: function() {
-            var o = core.char("+- ") + core.int(10);
-            return {
-                i: parseInt(o),
-                o: o.trim()
-            };
-        },
+        function integer() {
+            var s = core.char("+- ") + core.int(10);
+            return this.CSSContent(
+                parseInt(s),
+                s.trim()
+            );
+        }
 
         /**
-         * Returns a random CSS number.
+         * Generates a random CSS number.
          *
          * @method number
          * @memberOf dice.css
-         * @returns {object} An object with properties i (raw value) and o (string).
+         * @returns {CSSContent} Random CSS number.
          */
-        number: function() {
-            var o = core.char("+- ") + core.coin(0.5, core.int(100), "") + "." + core.int(100);
-            return {
-                i: parseFloat(o),
-                o: o.trim()
-            };
-        },
+        function number() {
+            var s = core.char("+- ") + core.coin(0.5, core.int(100), "") + "." + core.int(100);
+            return this.CSSContent(
+                parseFloat(s),
+                s.trim()
+            );
+        }
 
         /**
-         * Returns a random CSS length.
+         * Generates a random CSS length.
          *
          * @method length
          * @memberOf dice.css
-         * @returns {object} An object with properties i (raw value) and o (string).
+         * @returns {CSSContent} Random CSS length.
          */
-        length: function() {
-            var o = core.coin(0.5, core.int(100), "") + "." + core.int(100);
-            var i = parseFloat(o);
-            if (parseFloat(o) != 0) {
-                o += core.choice(["em", "ex", "px", "in", "cm", "mm", "pt", "pc", "%"]);
+        function length() {
+            var s = core.coin(0.5, core.int(100), "") + "." + core.int(100);
+            if (parseFloat(s) != 0) {
+                s += core.choice(["em", "ex", "px", "in", "cm", "mm", "pt", "pc", "%"]);
             } else {
-                o = "0";
+                s = "0";
             }
-            return {
-                i: i,
-                o: o.trim()
-            };
-        },
+            return this.CSSContent(
+                parseFloat(s),
+                s.trim()
+            );
+        }
 
         /**
-         * Returns a random CSS opacity-value.
+         * Generates a random CSS opacity-value.
          *
          * @method opacityValue
          * @memberOf dice.css
-         * @returns {object} An object with properties i (raw value) and o (string).
+         * @returns {CSSContent} Random CSS opacityValue.
          */
-        opacityValue: function() {
-            var r = this.number();
-            return {
-                i: Math.min(1, Math.max(0, r.i)),
-                o: r.o
-            };
-        },
+        function opacityValue() {
+            var s = core.choice([
+                "1", "0",
+                core.int(9) + "." + core.int(1, 1000) + core.char("Ee") + core.int(-10, -1),
+                core.char(" 0") + "." + core.int(1, 1000)
+            ]);
+            return this.CSSContent(
+                parseFloat(s),
+                s.trim()
+            );
+        }
 
         /**
-         * Returns a random CSS color.
+         * Generates a random CSS color.
          *
          * @method color
          * @memberOf dice.css
-         * @returns {object} An object with properties i (raw value) and o (string).
+         * @returns {CSSContent} Random CSS color.
          */
-        color: function() {
-            var i = {
+        function color() {
+            var o = {
                 r: core.int(255),
                 g: core.int(255),
                 b: core.int(255)
@@ -414,242 +559,278 @@
 
             // 6 digit hex
             if (Math.random() < 1/5) {
-                return {
-                    i: i,
-                    o: "#" + Math.floor(i.r/16).toString(16) + (i.r%16).toString(16)
-                    + Math.floor(i.g/16).toString(16) + (i.g%16).toString(16)
-                    + Math.floor(i.b/16).toString(16) + (i.b%16).toString(16)
-                };
+                return this.CSSContent(
+                    o,
+                    "#" + Math.floor(o.r/16).toString(16) + (o.r%16).toString(16)
+                    + Math.floor(o.g/16).toString(16) + (o.g%16).toString(16)
+                    + Math.floor(o.b/16).toString(16) + (o.b%16).toString(16)
+                );
             }
             // 3 digits hex
             if (Math.random() < 1/4) {
-                i = {
-                    r: Math.floor(i.r/16),
-                    g: Math.floor(i.g/16),
-                    b: Math.floor(i.b/16)
+                o = {
+                    r: Math.floor(o.r/16),
+                    g: Math.floor(o.g/16),
+                    b: Math.floor(o.b/16)
                 };
-                return {
-                    i: i,
-                    o: "#" + i.r.toString(16) + i.g.toString(16) + i.b.toString(16)
-                };
+                return this.CSSContent(
+                    o,
+                    "#" + o.r.toString(16) + o.g.toString(16) + o.b.toString(16)
+                );
             }
             // rgb with integers
             if (Math.random() < 1/3) {
-                return {
-                    i: i,
-                    o: "rgb(" + i.r + "," + i.g + "," + i.b + ")"
-                };
+                return this.CSSContent(
+                    o,
+                    "rgb(" + o.r + "," + o.g + "," + o.b + ")"
+                );
             }
             // rgb with percentages
             if (Math.random() < 1/2) {
-                return {
-                    i: i,
-                    o: "rgb(" + Math.floor(i.r/2.55) + "%," + Math.floor(i.g/2.55) + "%," + Math.floor(i.b/2.55) + "%)"
-                };
+                return this.CSSContent(
+                    o,
+                    "rgb(" + Math.floor(o.r/2.55) + "%," + Math.floor(o.g/2.55) + "%," + Math.floor(o.b/2.55) + "%)"
+                );
             } else {
                 var index = core.int(146);
-                var o = ["aliceblue", "antiquewhite", "aqua", "aquamarine", "azure", "beige", "bisque", "black",
-                        "blanchedalmond", "blue", "blueviolet", "brown", "burlywood", "cadetblue", "chartreuse",
-                        "chocolate", "coral", "cornflowerblue", "cornsilk", "crimson", "cyan", "darkblue", "darkcyan",
-                        "darkgoldenrod", "darkgray", "darkgreen", "darkgrey", "darkkhaki", "darkmagenta",
-                        "darkolivegreen", "darkorange", "darkorchid", "darkred", "darksalmon", "darkseagreen",
-                        "darkslateblue", "darkslategray", "darkslategrey", "darkturquoise", "darkviolet", "deeppink",
-                        "deepskyblue", "dimgray", "dimgrey", "dodgerblue", "firebrick", "floralwhite", "forestgreen",
-                        "fuchsia", "gainsboro", "ghostwhite", "gold", "goldenrod", "gray", "green", "greenyellow",
-                        "grey", "honeydew", "hotpink", "indianred", "indigo", "ivory", "khaki", "lavender",
-                        "lavenderblush", "lawngreen", "lemonchiffon", "lightblue", "lightcoral", "lightcyan",
-                        "lightgoldenrodyellow", "lightgray", "lightgreen", "lightgrey", "lightpink", "lightsalmon",
-                        "lightseagreen", "lightskyblue", "lightslategray", "lightslategrey", "lightsteelblue",
-                        "lightyellow", "lime", "limegreen", "linen", "magenta", "maroon", "mediumaquamarine",
-                        "mediumblue", "mediumorchid", "mediumpurple", "mediumseagreen", "mediumslateblue",
-                        "mediumspringgreen", "mediumturquoise", "mediumvioletred", "midnightblue", "mintcream",
-                        "mistyrose", "moccasin", "navajowhite", "navy", "oldlace", "olive", "olivedrab", "orange",
-                        "orangered", "orchid", "palegoldenrod", "palegreen", "paleturquoise", "palevioletred",
-                        "papayawhip", "peachpuff", "peru", "pink", "plum", "powderblue", "purple", "red", "rosybrown",
-                        "royalblue", "saddlebrown", "salmon", "sandybrown", "seagreen", "seashell", "sienna", "silver",
-                        "skyblue", "slateblue", "slategray", "slategrey", "snow", "springgreen", "steelblue", "tan",
-                        "teal", "thistle", "tomato", "turquoise", "violet", "wheat", "white", "whitesmoke", "yellow",
-                        "yellowgreen"][index];
+                var s = ["aliceblue", "antiquewhite", "aqua", "aquamarine", "azure", "beige", "bisque", "black",
+                    "blanchedalmond", "blue", "blueviolet", "brown", "burlywood", "cadetblue", "chartreuse",
+                    "chocolate", "coral", "cornflowerblue", "cornsilk", "crimson", "cyan", "darkblue", "darkcyan",
+                    "darkgoldenrod", "darkgray", "darkgreen", "darkgrey", "darkkhaki", "darkmagenta",
+                    "darkolivegreen", "darkorange", "darkorchid", "darkred", "darksalmon", "darkseagreen",
+                    "darkslateblue", "darkslategray", "darkslategrey", "darkturquoise", "darkviolet", "deeppink",
+                    "deepskyblue", "dimgray", "dimgrey", "dodgerblue", "firebrick", "floralwhite", "forestgreen",
+                    "fuchsia", "gainsboro", "ghostwhite", "gold", "goldenrod", "gray", "green", "greenyellow",
+                    "grey", "honeydew", "hotpink", "indianred", "indigo", "ivory", "khaki", "lavender",
+                    "lavenderblush", "lawngreen", "lemonchiffon", "lightblue", "lightcoral", "lightcyan",
+                    "lightgoldenrodyellow", "lightgray", "lightgreen", "lightgrey", "lightpink", "lightsalmon",
+                    "lightseagreen", "lightskyblue", "lightslategray", "lightslategrey", "lightsteelblue",
+                    "lightyellow", "lime", "limegreen", "linen", "magenta", "maroon", "mediumaquamarine",
+                    "mediumblue", "mediumorchid", "mediumpurple", "mediumseagreen", "mediumslateblue",
+                    "mediumspringgreen", "mediumturquoise", "mediumvioletred", "midnightblue", "mintcream",
+                    "mistyrose", "moccasin", "navajowhite", "navy", "oldlace", "olive", "olivedrab", "orange",
+                    "orangered", "orchid", "palegoldenrod", "palegreen", "paleturquoise", "palevioletred",
+                    "papayawhip", "peachpuff", "peru", "pink", "plum", "powderblue", "purple", "red", "rosybrown",
+                    "royalblue", "saddlebrown", "salmon", "sandybrown", "seagreen", "seashell", "sienna", "silver",
+                    "skyblue", "slateblue", "slategray", "slategrey", "snow", "springgreen", "steelblue", "tan",
+                    "teal", "thistle", "tomato", "turquoise", "violet", "wheat", "white", "whitesmoke", "yellow",
+                    "yellowgreen"][index];
                 var c = ["#F0F8FF", "#FAEBD7", "#00FFFF", "#7FFFD4", "#F0FFFF", "#F5F5DC", "#FFE4C4", "#000000",
-                        "#FFEBCD", "#0000FF", "#8A2BE2", "#A52A2A", "#DEB887", "#5F9EA0", "#7FFF00", "#D2691E",
-                        "#FF7F50", "#6495ED", "#FFF8DC", "#DC143C", "#00FFFF", "#00008B", "#008B8B", "#B8860B",
-                        "#A9A9A9", "#006400", "#A9A9A9", "#BDB76B", "#8B008B", "#556B2F", "#FF8C00", "#9932CC",
-                        "#8B0000", "#E9967A", "#8FBC8F", "#483D8B", "#2F4F4F", "#2F4F4F", "#00CED1", "#9400D3",
-                        "#FF1493", "#00BFFF", "#696969", "#696969", "#1E90FF", "#B22222", "#FFFAF0", "#228B22",
-                        "#FF00FF", "#DCDCDC", "#F8F8FF", "#FFD700", "#DAA520", "#808080", "#008000", "#ADFF2F",
-                        "#808080", "#F0FFF0", "#FF69B4", "#CD5C5C", "#4B0082", "#FFFFF0", "#F0E68C", "#E6E6FA",
-                        "#FFF0F5", "#7CFC00", "#FFFACD", "#ADD8E6", "#F08080", "#E0FFFF", "#FAFAD2", "#D3D3D3",
-                        "#90EE90", "#D3D3D3", "#FFB6C1", "#FFA07A", "#20B2AA", "#87CEFA", "#778899", "#778899",
-                        "#B0C4DE", "#FFFFE0", "#00FF00", "#32CD32", "#FAF0E6", "#FF00FF", "#800000", "#66CDAA",
-                        "#0000CD", "#BA55D3", "#9370DB", "#3CB371", "#7B68EE", "#00FA9A", "#48D1CC", "#C71585",
-                        "#191970", "#F5FFFA", "#FFE4E1", "#FFE4B5", "#FFDEAD", "#000080", "#FDF5E6", "#808000",
-                        "#6B8E23", "#FFA500", "#FF4500", "#DA70D6", "#EEE8AA", "#98FB98", "#AFEEEE", "#DB7093",
-                        "#FFEFD5", "#FFDAB9", "#CD853F", "#FFC0CB", "#DDA0DD", "#B0E0E6", "#800080", "#FF0000",
-                        "#BC8F8F", "#4169E1", "#8B4513", "#FA8072", "#F4A460", "#2E8B57", "#FFF5EE", "#A0522D",
-                        "#C0C0C0", "#87CEEB", "#6A5ACD", "#708090", "#708090", "#FFFAFA", "#00FF7F", "#4682B4",
-                        "#D2B48C", "#008080", "#D8BFD8", "#FF6347", "#40E0D0", "#EE82EE", "#F5DEB3", "#FFFFFF",
-                        "#F5F5F5", "#FFFF00", "#9ACD32"][index].replace('#', '');
-                return {
-                    i: {
-                        r: parseInt(c[0] + c[1], 16),
-                        g: parseInt(c[2] + c[3], 16),
-                        b: parseInt(c[4] + c[5], 16)
-                    },
-                    o: o
-                };
+                    "#FFEBCD", "#0000FF", "#8A2BE2", "#A52A2A", "#DEB887", "#5F9EA0", "#7FFF00", "#D2691E",
+                    "#FF7F50", "#6495ED", "#FFF8DC", "#DC143C", "#00FFFF", "#00008B", "#008B8B", "#B8860B",
+                    "#A9A9A9", "#006400", "#A9A9A9", "#BDB76B", "#8B008B", "#556B2F", "#FF8C00", "#9932CC",
+                    "#8B0000", "#E9967A", "#8FBC8F", "#483D8B", "#2F4F4F", "#2F4F4F", "#00CED1", "#9400D3",
+                    "#FF1493", "#00BFFF", "#696969", "#696969", "#1E90FF", "#B22222", "#FFFAF0", "#228B22",
+                    "#FF00FF", "#DCDCDC", "#F8F8FF", "#FFD700", "#DAA520", "#808080", "#008000", "#ADFF2F",
+                    "#808080", "#F0FFF0", "#FF69B4", "#CD5C5C", "#4B0082", "#FFFFF0", "#F0E68C", "#E6E6FA",
+                    "#FFF0F5", "#7CFC00", "#FFFACD", "#ADD8E6", "#F08080", "#E0FFFF", "#FAFAD2", "#D3D3D3",
+                    "#90EE90", "#D3D3D3", "#FFB6C1", "#FFA07A", "#20B2AA", "#87CEFA", "#778899", "#778899",
+                    "#B0C4DE", "#FFFFE0", "#00FF00", "#32CD32", "#FAF0E6", "#FF00FF", "#800000", "#66CDAA",
+                    "#0000CD", "#BA55D3", "#9370DB", "#3CB371", "#7B68EE", "#00FA9A", "#48D1CC", "#C71585",
+                    "#191970", "#F5FFFA", "#FFE4E1", "#FFE4B5", "#FFDEAD", "#000080", "#FDF5E6", "#808000",
+                    "#6B8E23", "#FFA500", "#FF4500", "#DA70D6", "#EEE8AA", "#98FB98", "#AFEEEE", "#DB7093",
+                    "#FFEFD5", "#FFDAB9", "#CD853F", "#FFC0CB", "#DDA0DD", "#B0E0E6", "#800080", "#FF0000",
+                    "#BC8F8F", "#4169E1", "#8B4513", "#FA8072", "#F4A460", "#2E8B57", "#FFF5EE", "#A0522D",
+                    "#C0C0C0", "#87CEEB", "#6A5ACD", "#708090", "#708090", "#FFFAFA", "#00FF7F", "#4682B4",
+                    "#D2B48C", "#008080", "#D8BFD8", "#FF6347", "#40E0D0", "#EE82EE", "#F5DEB3", "#FFFFFF",
+                    "#F5F5F5", "#FFFF00", "#9ACD32"][index].replace('#', '');
+                return this.CSSContent(
+                    {r: parseInt(c[0] + c[1], 16), g: parseInt(c[2] + c[3], 16), b: parseInt(c[4] + c[5], 16)},
+                    s
+                );
             }
         }
-    };
+
+        return {
+            CSSContent: CSSContent,
+            integer: integer,
+            number: number,
+            length: length,
+            opacityValue: opacityValue,
+            color: color
+        };
+    })();
 
     /**
-     * Generators of SVG related entities.
+     * A collection of methods to generate SVG content types.
      *
      * @namespace svg
      * @memberOf dice
      */
-    var svg = {
+    var svg = (function() {
         /**
-         * Returns a random SVG integer.
+         * Class describing a random SVG content.
+         * This is an alias for CSSContent.
+         *
+         * @class SVGContent
+         * @memberOf dice.svg
+         * @property {object} i Object corresponding to the SVG content. Can be a single string, an array, etc.
+         * @property {string} o String representation of the SVG content. This is the final value that is put after the
+         * colon in a property:value pair.
+         * @constructor
+         */
+        function SVGContent(o, s) {
+            return css.CSSContent(o, s);
+        }
+
+        /**
+         * Generates a random SVG integer.
          *
          * @method integer
          * @memberOf dice.svg
-         * @returns {object} An object with properties i (raw value) and o (string).
+         * @returns {SVGContent} Random SVG integer.
          */
-        integer: function() {
+        function integer() {
             return css.integer();
-        },
+        }
 
         /**
-         * Returns a random SVG number.
+         * Generates a random SVG number.
          *
          * @method number
          * @memberOf dice.svg
-         * @returns {object} An object with properties i (raw value) and o (string).
+         * @returns {SVGContent} Random SVG number.
          */
-        number: function() {
-            var o = core.char("+- ")
+        function number() {
+            var s = core.char("+- ")
                 + core.coin(0.5, core.int(10) + ".", "")
                 + core.int(1, 1000)
                 + core.coin(0.5, core.char("Ee") + core.int(4), "");
-            return  {
-                i: parseFloat(o),
-                o: o.trim()
-            };
-        },
+            return this.SVGContent(
+                parseFloat(s),
+                s.trim()
+            );
+        }
 
         /**
-         * Returns a random SVG length.
+         * Generates a random SVG length.
          *
          * @method length
          * @memberOf dice.svg
-         * @returns {object} An object with properties i (raw value) and o (string).
+         * @returns {SVGContent} Random SVG length.
          */
-        length: function() {
+        function length() {
             var r = this.number();
-            if (r.o.charAt(0) == "-")
-                r.o.replace("-", "");
-            return {
-                i: r.i,
-                o: r.o + core.choice(["", "em", "ex", "px", "in", "cm", "mm", "pt", "pc", "%"])
-            };
-        },
+            if (r.s.charAt(0) == "-")
+                r.s.replace("-", "");
+            return this.SVGContent(
+                r.o,
+                r.s + core.choice(["", "em", "ex", "px", "in", "cm", "mm", "pt", "pc", "%"])
+            );
+        }
 
         /**
-         * Returns a random SVG coordinate.
+         * Generates a random SVG coordinate.
          *
          * @method coordinate
          * @memberOf dice.svg
-         * @returns {string} Random coordinate.
+         * @returns {SVGContent} Random SVG coordinate.
          */
-        coordinate: function() {
+        function coordinate() {
             return this.length();
-        },
+        }
 
         /**
-         * Returns a random SVG color.
-         *
-         * @method color
-         * @memberOf dice.svg
-         * @returns {string} Random color.
-         */
-        color: function() {
-            return css.color();
-        },
-
-        /**
-         * Returns a random SVG opacity-value.
+         * Generates a random SVG opacity-value.
          *
          * @method opacityValue
          * @memberOf dice.svg
-         * @returns {string} Random opacity-value.
+         * @returns {SVGContent} Random SVG opacity-value.
          */
-        opacityValue: function() {
+        function opacityValue() {
             return css.opacityValue();
-        },
+        }
 
         /**
-         * Returns a random SVG transform-list.
+         * Generates a random SVG color.
+         *
+         * @method color
+         * @memberOf dice.svg
+         * @returns {SVGContent} Random SVG color.
+         */
+        function color() {
+            return css.color();
+        }
+
+        /**
+         * Generates a random SVG transform-list.
          *
          * @method transformList
          * @memberOf dice.svg
-         * @returns {string} Random transform-list.
+         * @returns {SVGContent} Random SVG transform-list.
          */
-        transformList: function() {
-            var transform = "";
-            while (transform == "") {
+        function transformList() {
+            var o = [];
+            var s = "";
+            while (s == "") {
                 ["matrix", "translate", "scale", "rotate", "skewX", "skewY"].forEach(function(t) {
                     if (Math.random() < 0.5)
                         return;
 
-                    transform += t + "(";
+                    var m = null;
                     switch (t) {
                         case "matrix":
-                            transform += core.float(-10, 10, 6).join(",");
+                            m = core.float(-10, 10, 6);
+                            s += m.join(",");
                             break;
                         case "translate":
-                            transform += core.float(-10, 10)
-                                + (Math.random() < 0.5 ? "," + core.float(-10, 10) : "");
+                            m = [1, 0, 0, 1, core.float(-10, 10), 0];
+                            s += m[4];
+                            if (Math.random() < 0.5) {
+                                m[5] = core.float(-10, 10);
+                                s += "," + m[5];
+                            }
                             break;
                         case "scale":
-                            transform += core.float(0, 10)
-                                + (Math.random() < 0.5 ? "," + core.float(0, 10) : "");
+                            m = [core.float(-10, 10), 0, 0, 0, 0, 0];
+                            s += m[0];
+                            if (Math.random() < 0.5) {
+                                m[3] = core.float(-10, 10);
+                                s += "," + m[3];
+                            } else {
+                                m[3] = m[0];
+                            }
                             break;
                         case "rotate":
-                            transform += core.float(-10, 10)
+                            s += core.float(-10, 10)
                                 + (Math.random() < 0.5 ? "," + core.float(-10, 10, 2).join(",") : "");
                             break;
                         case "skewX":
                         case "skewY":
-                            transform += core.float(-10, 10);
+                            s += core.float(-10, 10);
                             break;
                         default:
                             break;
                     }
-                    transform += ") ";
+                    o.push(m);
+                    s = "(" + s + ") ";
                 });
             }
-            return transform.trim();
-        },
+            return this.SVGContent(
+                o,
+                s.trim()
+            );
+        }
 
         /**
-         * Returns a random point.
+         * Generates a random point.
          *
          * @method point
          * @memberOf dice.svg
-         * @returns {string} Random point.
+         * @returns {SVGContent} Random SVG point.
          */
-        point: function() {
+        function point() {
             return core.float(-10, 10, 2).join(",");
-        },
+        }
 
         /**
-         * Returns a random path.
+         * Generates a random path.
          *
          * @method path
          * @memberOf dice.svg
-         * @returns {string} Random path.
+         * @returns {SVGContent} Random SVG path.
          */
-        path: function() {
+        function path() {
             var length = core.int(10);
             var path = "M " + core.float(-10, 10, 2).join(" ");
             for (var i=0; i<length; i++) {
@@ -689,105 +870,11 @@
             }
             return path.trim();
         }
-    };
-/*        custom: function() {
-            /!**
-             * Parameters of the generator: population, biased coins and aliases.
-             *!/
-            var n = 0;
-            var prob = [];
-            var alias = [];
+    })();
 
-            return {
-                /!**
-                 * Initializes alias table with the given weights.
-                 * Weigts need not to be normalized.
-                 *
-                 * @param weights Weights to use in the alias table.
-                 *!/
-                init: function (weights) {
-                    // Single element
-                    if (weights.length == 0 || !(weights instanceof Array)) {
-                        prob = [0];
-                        alias = [0];
-                        return;
-                    }
-
-                    // Get sum (for normalization)
-                    n = weights.length;
-                    var sum = 0;
-                    for (var i = 0; i < n; i++)
-                        sum += weights[i];
-
-                    // Fill up small and large work lists
-                    var p = [];
-                    var small = [];
-                    var large = [];
-                    for (i = 0; i < n; i++) {
-                        p.push(this._n * weights[i] / sum);
-                        if (p[i] < 1.0)
-                            small.push(i);
-                        else
-                            large.push(i);
-                    }
-
-                    // Init tables
-                    prob = [];
-                    alias = [];
-                    for (i = 0; i < this._n; i++) {
-                        prob.push(1.0);
-                        alias.push(i);
-                    }
-
-                    // Fill up alias table
-                    var s = 0,
-                        l = 0;
-                    while (small.length > 0 && large.length > 0) {
-                        s = small.shift();
-                        l = large.shift();
-
-                        prob[s] = p[s];
-                        alias[s] = l;
-
-                        p[l] += p[s] - 1.0;
-                        if (p[l] < 1.0)
-                            small.push(l);
-                        else
-                            large.push(l);
-                    }
-                    while (large.length > 0) {
-                        l = large.shift();
-                        prob[l] = 1.0;
-                        alias[l] = l;
-                    }
-                    while (small.length > 0) {
-                        s = small.shift();
-                        prob[s] = 1.0;
-                        alias[s] = s;
-                    }
-                },
-
-                /!**
-                 * Returns an integer value according to the current alias table.
-                 *
-                 * @returns {number} Random integer.
-                 *!/
-                sample: function () {
-                    if (n <= 1) {
-                        return 0;
-                    }
-
-                    var i = Math.floor(Math.random() * n);
-                    if (Math.random() < prob[i])
-                        return i;
-                    else
-                        return alias[i];
-                }
-            };
-        };*/
-
+    // Exports
     exports.core = core;
+    exports.dist = dist;
     exports.css = css;
     exports.svg = svg;
-    exports.dist = dist;
 })));

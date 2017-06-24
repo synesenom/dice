@@ -51,7 +51,6 @@ var test_utils = {
             return a - b;
         });
         for (var i = 0; i < values.length; i++) {
-            //console.log((i+1)/values.length, model(values[i]));
             D = Math.max(D, Math.abs((i + 1) / values.length - model(values[i])));
         }
         return D <= 1.628 / Math.sqrt(values.length);
@@ -77,7 +76,6 @@ var test_utils = {
         var chi2 = 0;
         for (var x in p) {
             var m = model(x) * values.length;
-            //console.log(p[x], m);
             chi2 += Math.pow(p[x] - m, 2) / m;
         }
 

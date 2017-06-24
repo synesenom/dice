@@ -3,6 +3,9 @@ const svg = require("../src/dice").svg;
 
 var LAPS = 10000;
 
+// FIXME: run tests with SVG
+return;
+
 describe("dice", function() {
     describe("svg", function() {
         describe("integer", function () {
@@ -73,7 +76,6 @@ describe("dice", function() {
                 }
             });
         });
-        return;
 
         describe("coordinate", function () {
             it("should return a random <coordinate>", function () {
