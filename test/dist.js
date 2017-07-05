@@ -3,6 +3,7 @@ var utils = require('../test/test-utils').test_uils;
 var math = require('mathjs');
 var jstat = require('jstat');
 var dist = require('../src/dice').dist;
+var special = require('../src/dice')._special;
 
 var LAPS = 1000;
 
@@ -88,6 +89,18 @@ describe('dice', function() {
                     const k = Math.random()*10 + 0.1;
                     return utils.ks_test(dist.weibull(lambda, k, LAPS), function (x) {
                         return 1 - Math.exp(-Math.pow(x/lambda, k));
+                    });
+                });
+            });
+        });
+
+        describe('gamma', function () {
+            it('should return an array of Weibull distributed values', function () {
+                utils.trials(function() {
+                    const alpha = Math.random()*3;
+                    const beta = Math.random()*3;
+                    return utils.ks_test(dist.gamma(alpha, beta, LAPS), function (x) {
+                        return special.gammaLowerIncomplete(alpha, beta*x) / special.gamma(alpha);
                     });
                 });
             });

@@ -1,13 +1,14 @@
 /**
  * Module for generating various random numbers and objects.
  * @module dice
- * FIXME add some more distributions: https://en.wikipedia.org/wiki/List_of_probability_distributions
- * FIXME add alias table
- * TODO add jsdoc to CSS
- * TODO add jsdoc to SVG
- * FIXME make SVG methods return object
- * FIXME go through documentation and finalize
- * TODO add processes: https://en.wikipedia.org/wiki/Stochastic_process
+ *
+ * @todo add some more distributions: https://en.wikipedia.org/wiki/List_of_probability_distributions
+ * @todo add alias table
+ * @todo add jsdoc to CSS
+ * @todo add jsdoc to SVG
+ * @todo make SVG methods return object
+ * @todo go through documentation and finalize
+ * @todo add processes: https://en.wikipedia.org/wiki/Stochastic_process
  */
 // UMD
 (function (global, factory) {
@@ -38,7 +39,7 @@
     }
 
     /**
-     * Runs a generator method once or several times to return a single value or an array of values.
+     * Runs a generator once or several times to return a single value or an array of values.
      *
      * @method some
      * @memberOf dice
@@ -57,6 +58,146 @@
             return values;
         }
     }
+
+    /**
+     * Some special functions.
+     *
+     * @namespace special
+     * @memberOf dice
+     * @private
+     */
+    var special = (function(){
+        /**
+         * Maximum number of iterations in function approximations.
+         *
+         * @var {number} _MAX_ITER
+         * @memberOf dice.special
+         * @private
+         */
+        var _MAX_ITER = 100;
+
+        /**
+         * Error tolerance in function approximations.
+         *
+         * @var {number} _EPSILON
+         * @memberOf dice.special
+         * @private
+         */
+        var _EPSILON = 1e-10;
+
+        /**
+         * Gamma function, using the Lanczos approximation.
+         *
+         * @method gamma
+         * @memberOf dice.special
+         * @param {number} z Value to evaluate Gamma function at.
+         * @returns {number} Gamma function value.
+         * @private
+         */
+        var gamma = (function() {
+            // Coefficients
+            var _p = [
+                676.5203681218851,
+                -1259.1392167224028,
+                771.32342877765313,
+                -176.61502916214059,
+                12.507343278686905,
+                -0.13857109526572012,
+                9.9843695780195716e-6,
+                1.5056327351493116e-7
+            ];
+
+            // Lanczos approximation
+            function _gamma(z) {
+                var y = 0;
+                if (z < 0.5) {
+                    y = Math.PI / (Math.sin(Math.PI*z) * _gamma(1-z));
+                } else {
+                    z--;
+                    var x = 0.99999999999980993;
+                    var l = _p.length;
+                    _p.forEach(function (p, i) {
+                        x += p / (z+i+1);
+                        var t = z + l - 0.5;
+                        y = Math.sqrt(2*Math.PI) * Math.pow(t, (z+0.5)) * Math.exp(-t) * x;
+                    });
+                }
+                return y;
+            }
+
+            return _gamma;
+        })();
+
+        /**
+         * Lower incomplete gamma function, using the series expansion and continued fraction approximations.
+         *
+         * @method gammaLowerIncomplete
+         * @memberOf dice.special
+         * @param {number} a Parameter of the integrand in the integral definition.
+         * @param {number} x Lower boundary of the integral.
+         * @returns {number} Value of the lower incomplete gamma function.
+         * @private
+         */
+        var gammaLowerIncomplete = (function() {
+            var _DELTA = 1e-30;
+
+            // Lower incomplete gamma generator using the series expansion
+            function _gli_series(s, x) {
+                if (x < 0) {
+                    return 0;
+                } else {
+                    var si = s,
+                        y = 1/s;
+                    var f = 1/s;
+                    for (var i=0; i<_MAX_ITER; i++) {
+                        si++;
+                        y *= x/si;
+                        f += y;
+                        if (y < f*_EPSILON)
+                            break;
+                    }
+                    return Math.exp(-x) * Math.pow(x, s) * f;
+                }
+            }
+
+            // Upper incomplete gamma generator using the continued fraction expansion
+            function _gui_continued_fraction(s, x) {
+                var b = x + 1 - s,
+                    c = 1 / _DELTA;
+                var d = 1 / b;
+                var f = d,
+                    fi, y;
+                for (var i=1; i<=_MAX_ITER; i++) {
+                    fi = i * (s-i);
+                    b += 2;
+                    d = fi * d + b;
+                    if (Math.abs(d) < _DELTA)
+                        d = _DELTA;
+                    d = 1 / d;
+                    c = b + fi / c;
+                    if (Math.abs(c) < _DELTA)
+                        c = _DELTA;
+                    y = c * d;
+                    f *= y;
+                    if (Math.abs(y-1) < _EPSILON)
+                        break;
+                }
+                return Math.exp(-x) * Math.pow(x, s) * f;
+            }
+
+            return function(s, x) {
+                if (x < s+1)
+                    return _gli_series(s, x);
+                else
+                    return gamma(s) - _gui_continued_fraction(s, x);
+            };
+        })();
+
+        return {
+            gamma: gamma,
+            gammaLowerIncomplete: gammaLowerIncomplete
+        };
+    })();
 
     /**
      * Core functionality: basic generators and manipulators.
@@ -313,6 +454,43 @@
         }
 
         /**
+         * Generates some gamma distributed random values according to the rate parametrization.
+         *
+         * @method gamma
+         * @memberOf dice.dist
+         * @param {number} alpha Shape parameter.
+         * @param {number} beta Rate parameter.
+         * @param {number=} n Number of values to return.
+         * @returns {(number|Array)} Single value or array of random values.
+         */
+        var gamma = (function() {
+            function _gamma(alpha, beta) {
+                if (alpha > 1) {
+                    var d = alpha - 1 / 3;
+                    var c = 1 / Math.sqrt(9 * d),
+                        Z, V, U;
+                    while (true) {
+                        Z = normal(0, 1);
+                        if (Z > -1 / c) {
+                            V = Math.pow(1 + c * Z, 3);
+                            U = Math.random();
+                            if (Math.log(U) < 0.5 * Z * Z + d * (1 - V + Math.log(V)))
+                                return d * V / beta;
+                        }
+                    }
+                } else {
+                    return _gamma(alpha + 1, beta) * Math.pow(Math.random(), 1 / alpha);
+                }
+            }
+
+            return function (alpha, beta, n) {
+                return _some(function () {
+                    return _gamma(alpha, beta);
+                }, n);
+            };
+        })();
+
+        /**
          * Generates some Poisson distributed random values.
          * FIXME use different methods for small/large lambda
          *
@@ -448,6 +626,7 @@
             pareto: pareto,
             boundedPareto: boundedPareto,
             weibull: weibull,
+            gamma: gamma,
             poisson: poisson,
             Alias: Alias
         };
@@ -873,6 +1052,7 @@
     })();
 
     // Exports
+    exports._special = special;
     exports.core = core;
     exports.dist = dist;
     exports.css = css;
